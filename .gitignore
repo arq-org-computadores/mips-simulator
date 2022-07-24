@@ -1,0 +1,9 @@
+# Intellij Directories
+.idea/
+
+# VSCode
+.vscode/
+
+# Maven
+out/
+target/
