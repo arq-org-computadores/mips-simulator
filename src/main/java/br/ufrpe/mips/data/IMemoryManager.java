@@ -62,7 +62,6 @@ public interface IMemoryManager {
    */
   IWordMemoryLocation getWordMemoryLocationFromAddress(int address);
 
-
   /**
    * Retorna todas as localizações de memória que iniciam uma palavra.
    * 
