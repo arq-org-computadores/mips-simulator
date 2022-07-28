@@ -1,5 +1,7 @@
 package br.ufrpe.mips.data;
 
+import java.util.List;
+
 /**
  * Essa interface representa toda estrutura de memória
  * necessária para um processador MIPS32. Ou seja,
@@ -34,6 +36,13 @@ public interface IMemoryManager {
    * @return {@link IMemoryLocation} ou null.
    */
   IMemoryLocation getByteMemoryLocationFromAddress(int address);
+  
+  /**
+   * Retorna todas as localizações de memória.
+   * 
+   * @return uma lista de todas localizações de memória.
+   */
+  List<IMemoryLocation> byteMemoryLocations();
 
   /**
    * Checa se um dado endereço está alinhando com os limites das palavras.
@@ -52,6 +61,14 @@ public interface IMemoryManager {
    * @return {@link IMemoryLocation} ou null.
    */
   IWordMemoryLocation getWordMemoryLocationFromAddress(int address);
+
+
+  /**
+   * Retorna todas as localizações de memória que iniciam uma palavra.
+   * 
+   * @return retorna uma lista de todas localizações de memória de palavra.
+   */
+  List<IWordMemoryLocation> wordMemoryLocations();
 
   /**
    * Retorna o registrador com esse número ou null.
