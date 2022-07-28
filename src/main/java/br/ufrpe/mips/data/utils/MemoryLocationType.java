@@ -1,4 +1,4 @@
-package br.ufrpe.mips.data.entity;
+package br.ufrpe.mips.data.utils;
 
 public enum MemoryLocationType {
   RESERVED, MAPPED_IO, KERNEL_DATA, KERNEL_TEXT,

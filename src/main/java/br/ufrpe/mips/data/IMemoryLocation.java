@@ -1,6 +1,6 @@
 package br.ufrpe.mips.data;
 
-import br.ufrpe.mips.data.entity.MemoryLocationType;
+import br.ufrpe.mips.data.utils.MemoryLocationType;
 
 /**
  * Essa interface determina todas funcionalidades

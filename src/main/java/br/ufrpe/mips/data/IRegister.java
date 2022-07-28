@@ -1,6 +1,6 @@
 package br.ufrpe.mips.data;
 
-import br.ufrpe.mips.data.entity.RegisterType;
+import br.ufrpe.mips.data.utils.RegisterType;
 
 /**
  * Essa interface determina todas funcionalidades
