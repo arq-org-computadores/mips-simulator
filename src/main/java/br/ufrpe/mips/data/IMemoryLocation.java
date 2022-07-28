@@ -4,11 +4,11 @@ import br.ufrpe.mips.data.entity.MemoryLocationType;
 
 /**
  * Essa interface determina todas funcionalidades
- * de um local de memória que pode armazenar 8 bits.
+ * de um local de memória que armazena dados do tipo T.
  * 
  * @version 1.0
  */
-public interface IMemoryLocation {
+public interface IMemoryLocation<T> {
   
   /**
    * Se essa localização é reservada.
@@ -34,14 +34,14 @@ public interface IMemoryLocation {
   /**
    * Qual valor armazenado nessa localização de memória.
    * 
-   * @return byte, conteúdo nessa localização.
+   * @return T, conteúdo nessa localização.
    */
-  byte read();
+  T read();
 
   /**
    * Armazena um valor nessa localização de memória.
    * 
-   * @param content byte.
+   * @param content dado do tipo T.
    */
-  void write(byte content);
+  void write(T content);
 }

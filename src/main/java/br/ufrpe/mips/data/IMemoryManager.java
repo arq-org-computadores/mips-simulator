@@ -10,11 +10,9 @@ import java.util.List;
  * É possível obter registradores e locais de memória, além
  * de realizar operações neles.
  * 
- * Existem dois tipos de local de memória: byte-memory location
- * e word-memory location. Em um byte-memory location, 8-bits
- * podem ser lidos e escritos por vez. Já em um word-memory location,
- * uma palavra MIPS pode ser lida ou escrita por vez (através da
- * manipulação de 4 byte-memory locations).
+ * Existem dois tipos de local de memória para manipulação: 
+ * locais que armazenam 1 byte (8 bits) e locais que armazenam
+ * uma palavra MIPS (4 bytes, 32 bits).
  * 
  * Registradores podem ser de uso especial (PC, HI, LO, etc) ou geral,
  * lendo e armazenando 32-bits.
@@ -35,20 +33,21 @@ public interface IMemoryManager {
    * @param address endereço da localização de memória.
    * @return {@link IMemoryLocation} ou null.
    */
-  IMemoryLocation getByteMemoryLocationFromAddress(int address);
-  
+  IMemoryLocation<Byte> getByteMemoryLocationFromAddress(int address);
+
   /**
    * Retorna todas as localizações de memória.
    * 
    * @return uma lista de todas localizações de memória.
    */
-  List<IMemoryLocation> byteMemoryLocations();
+  List<IMemoryLocation<Byte>> byteMemoryLocations();
 
   /**
    * Checa se um dado endereço está alinhando com os limites das palavras.
    * 
    * @param address endereço.
-   * @return true caso o endereço esteja alinhado com uma palavra, falso do contrário.
+   * @return true caso o endereço esteja alinhado com uma palavra, falso do
+   *         contrário.
    */
   boolean isAddressWordAligned(int address);
 
@@ -60,14 +59,14 @@ public interface IMemoryManager {
    * @param address endereço da localização de memória (word-aligned).
    * @return {@link IMemoryLocation} ou null.
    */
-  IWordMemoryLocation getWordMemoryLocationFromAddress(int address);
+  IMemoryLocation<Integer> getWordMemoryLocationFromAddress(int address);
 
   /**
    * Retorna todas as localizações de memória que iniciam uma palavra.
    * 
    * @return retorna uma lista de todas localizações de memória de palavra.
    */
-  List<IWordMemoryLocation> wordMemoryLocations();
+  List<IMemoryLocation<Integer>> wordMemoryLocations();
 
   /**
    * Retorna o registrador com esse número ou null.
