@@ -45,7 +45,16 @@ public interface IMIPS32 {
   void runInstruction(String hexInstruction);
 
   /**
-   * Retorna representação em Assembly para MIPS da última instrução.
+   * Retorna a saída escrita na saída padrão ou
+   * String vazia caso nada tenha sido escrito.
+   * 
+   * @return String escrita na saída padrão.
+   */
+  String output();
+
+  /**
+   * Retorna representação em Assembly para MIPS da última instrução,
+   * retorna String vazia caso nenhuma instrução tenha sido executada.
    * 
    * @return representação em assembly.
    */
