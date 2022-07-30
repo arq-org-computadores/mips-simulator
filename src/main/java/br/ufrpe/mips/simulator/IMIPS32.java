@@ -1,5 +1,6 @@
 package br.ufrpe.mips.simulator;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -15,6 +16,13 @@ public interface IMIPS32 {
    * Limpa toda memória do simulador MIPS para os valores padrão.
    */
   void reset();
+
+  /**
+   * Carrega das instruções no segmento `text` da memória principal.
+   * 
+   * @param hexInstructions lista de instruções MIPS32 em Hexadecimal.
+   */
+  void loadInstructions(List<String> hexInstructions);
 
   /**
    * Carrega dados no segmento `data` da memória principal.
@@ -38,11 +46,9 @@ public interface IMIPS32 {
   void loadRegisters(Map<String, Integer> regs);
 
   /**
-   * Executa uma instrução codificada em hexadecimal.
-   * 
-   * @param hexInstruction instrução em hexadecimal.
+   * Executa a próxima instrução do segmento `text.
    */
-  void runInstruction(String hexInstruction);
+  void runNexInstruction();
 
   /**
    * Retorna a saída escrita na saída padrão ou

@@ -1,5 +1,6 @@
 package br.ufrpe.mips.simulator.imp;
 
+import java.util.List;
 import java.util.Map;
 
 import br.ufrpe.mips.data.IMemoryManager;
@@ -40,12 +41,6 @@ public class MIPS32Processor implements IMIPS32 {
   }
 
   @Override
-  public void runInstruction(String hexInstruction) {
-    // TODO Auto-generated method stub
-
-  }
-
-  @Override
   public String output() {
     // TODO Auto-generated method stub
     return null;
@@ -67,6 +62,18 @@ public class MIPS32Processor implements IMIPS32 {
   public Map<Integer, Integer> memory() {
     // TODO Auto-generated method stub
     return null;
+  }
+
+  @Override
+  public void loadInstructions(List<String> hexInstructions) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void runNexInstruction() {
+    // TODO Auto-generated method stub
+    
   }
 
 }
