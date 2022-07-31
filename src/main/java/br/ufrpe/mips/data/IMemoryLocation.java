@@ -29,7 +29,7 @@ public interface IMemoryLocation<T> {
    * 
    * @return inteiro, indicando o endereço dessa localização de memória.
    */
-  int address();
+  long address();
 
   /**
    * Qual valor armazenado nessa localização de memória.

@@ -36,7 +36,7 @@ public final class WordMemoryLocation implements IMemoryLocation<Integer> {
   }
 
   @Override
-  public int address() {
+  public long address() {
     return this.cell0.address();
   }
 

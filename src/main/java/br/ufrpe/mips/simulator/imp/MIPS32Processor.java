@@ -23,13 +23,13 @@ public class MIPS32Processor implements IMIPS32 {
   }
 
   @Override
-  public void loadData(Map<Integer, Integer> data) {
+  public void loadData(Map<Long, Integer> data) {
     // TODO Auto-generated method stub
 
   }
 
   @Override
-  public void loadMemory(Map<Integer, Integer> mem) {
+  public void loadMemory(Map<Long, Integer> mem) {
     // TODO Auto-generated method stub
 
   }
@@ -59,7 +59,7 @@ public class MIPS32Processor implements IMIPS32 {
   }
 
   @Override
-  public Map<Integer, Integer> memory() {
+  public Map<Long, Integer> memory() {
     // TODO Auto-generated method stub
     return null;
   }

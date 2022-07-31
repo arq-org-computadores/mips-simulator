@@ -11,11 +11,11 @@ import br.ufrpe.mips.data.utils.MemoryLocationType;
  */
 public final class ByteMemoryLocation implements IMemoryLocation<Byte> {
 
-  private final int address;
+  private final long address;
   private final MemoryLocationType memType;
   private Byte value;
 
-  public ByteMemoryLocation(int address, MemoryLocationType memType) {
+  public ByteMemoryLocation(long address, MemoryLocationType memType) {
     this.address = Objects.requireNonNull(address);
     this.memType = Objects.requireNonNull(memType);
     this.value = 0;
@@ -33,7 +33,7 @@ public final class ByteMemoryLocation implements IMemoryLocation<Byte> {
   }
 
   @Override
-  public int address() {
+  public long address() {
     return this.address;
   }
 

@@ -33,7 +33,7 @@ public interface IMemoryManager {
    * @param address endereço da localização de memória.
    * @return {@link IMemoryLocation} ou null.
    */
-  IMemoryLocation<Byte> getByteMemoryLocationFromAddress(int address);
+  IMemoryLocation<Byte> getByteMemoryLocationFromAddress(long address);
 
   /**
    * Retorna todas as localizações de memória.
@@ -49,7 +49,7 @@ public interface IMemoryManager {
    * @return true caso o endereço esteja alinhado com uma palavra, falso do
    *         contrário.
    */
-  boolean isAddressWordAligned(int address);
+  boolean isAddressWordAligned(long address);
 
   /**
    * Retorna a localização de memória associada com esse endereço
@@ -59,7 +59,7 @@ public interface IMemoryManager {
    * @param address endereço da localização de memória (word-aligned).
    * @return {@link IMemoryLocation} ou null.
    */
-  IMemoryLocation<Integer> getWordMemoryLocationFromAddress(int address);
+  IMemoryLocation<Integer> getWordMemoryLocationFromAddress(long address);
 
   /**
    * Retorna todas as localizações de memória que iniciam uma palavra.
