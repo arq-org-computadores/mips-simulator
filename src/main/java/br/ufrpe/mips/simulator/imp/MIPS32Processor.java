@@ -82,4 +82,10 @@ public class MIPS32Processor implements IMIPS32 {
     return false;
   }
 
+  @Override
+  public String toHex() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

@@ -74,6 +74,14 @@ public interface IMIPS32 {
   String toAssembly();
 
   /**
+   * Retorna representação em Hexadecimal a última instrução,
+   * retornando String vazia caso nenhuma instrução tenha sido executada.
+   * 
+   * @return representação em hexadecimal.
+   */
+  String toHex();
+
+  /**
    * Estado atual dos registradores.
    * 
    * @return Mapa de String (identificador) para inteiro (valor).
