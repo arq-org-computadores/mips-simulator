@@ -1,5 +1,6 @@
 package br.ufrpe.mips.data.imp;
 
+import java.util.Objects;
 import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.utils.MemoryLocationType;
 
@@ -10,34 +11,40 @@ import br.ufrpe.mips.data.utils.MemoryLocationType;
  */
 public final class ByteMemoryLocation implements IMemoryLocation<Byte> {
 
+  private final long address;
+  private final MemoryLocationType memType;
+  private Byte value;
+
+  public ByteMemoryLocation(long address, MemoryLocationType memType) {
+    this.address = Objects.requireNonNull(address);
+    this.memType = Objects.requireNonNull(memType);
+    this.value = 0;
+  }
+
   @Override
   public boolean isReserved() {
-    // TODO Auto-generated method stub
-    return false;
+    // Confirmar se existem outros espaços reservados
+    return this.memType == MemoryLocationType.RESERVED;
   }
 
   @Override
   public MemoryLocationType type() {
-    // TODO Auto-generated method stub
-    return null;
+    return this.memType;
   }
 
   @Override
-  public int address() {
-    // TODO Auto-generated method stub
-    return 0;
+  public long address() {
+    return this.address;
   }
 
   @Override
   public Byte read() {
-    // TODO Auto-generated method stub
-    return null;
+    return this.value;
   }
 
   @Override
   public void write(Byte content) {
-    // TODO Auto-generated method stub
-
+    this.value = content;
   }
 
 }

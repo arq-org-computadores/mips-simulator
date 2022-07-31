@@ -14,7 +14,7 @@ public class InputJSON {
   public Configs configs;
 
   @JsonProperty("data")
-  public Map<Integer, String> data;
+  public Map<Long, String> data;
 
   @JsonProperty("text")
   public List<String> instructions;
@@ -24,75 +24,58 @@ public class InputJSON {
     public Map<String, String> registers;
 
     @JsonProperty("mem")
-    public Map<Integer, String> memory;
+    public Map<Long, String> memory;
   }
 
   /**
-   * Método utilitário, retorna uma versão
-   * dos registradores onde todos os valores são
-   * inteiros de 32-bits.
+   * Método utilitário, retorna uma versão dos registradores onde todos os valores são inteiros de
+   * 32-bits.
    * 
    * @return um mapa de String para inteiros.
    */
   public Map<String, Integer> registersMap() {
-    return this.configs.registers
-        .entrySet()
-        .stream()
-        .map(e -> {
-          String k = e.getKey();
+    return this.configs.registers.entrySet().stream().map(e -> {
+      String k = e.getKey();
 
-          // Conversão para inteiro de 64-bits
-          // seguido por conversão para 32-bits
-          Integer v = (int) Long.parseLong(e.getValue());
+      // Conversão para inteiro de 64-bits
+      // seguido por conversão para 32-bits
+      Integer v = (int) Long.parseLong(e.getValue());
 
-          return new AbstractMap.SimpleEntry<String, Integer>(k, v);
-        })
-        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+      return new AbstractMap.SimpleEntry<String, Integer>(k, v);
+    }).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
   /**
-   * Método utilitário, uma versão da memória
-   * onde todos os valores são inteiros
-   * de 32-bits.
+   * Método utilitário, uma versão da memória onde todos os valores são inteiros de 32-bits.
    * 
    * @return um mapa de inteiros para inteiros.
    */
-  public Map<Integer, Integer> memoryMap() {
-    return this.configs.memory
-        .entrySet()
-        .stream()
-        .map(e -> {
-          Integer k = e.getKey();
+  public Map<Long, Integer> memoryMap() {
+    return this.configs.memory.entrySet().stream().map(e -> {
+      Long k = e.getKey();
 
-          // Conversão para inteiro de 64-bits
-          // seguido por conversão para 32-bits
-          Integer v = (int) Long.parseLong(e.getValue());
+      // Conversão para inteiro de 64-bits
+      // seguido por conversão para 32-bits
+      Integer v = (int) Long.parseLong(e.getValue());
 
-          return new AbstractMap.SimpleEntry<Integer, Integer>(k, v);
-        })
-        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+      return new AbstractMap.SimpleEntry<Long, Integer>(k, v);
+    }).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 
   /**
-   * Método utilitário, uma versão da memória
-   * onde todos os valores são inteiros
-   * de 32-bits.
+   * Método utilitário, uma versão da memória onde todos os valores são inteiros de 32-bits.
    * 
    * @return um mapa de inteiros para inteiros.
    */
-  public Map<Integer, Integer> dataMap() {
-    return this.data
-        .entrySet()
-        .stream()
-        .map(e -> {
-          Integer k = e.getKey();
+  public Map<Long, Integer> dataMap() {
+    return this.data.entrySet().stream().map(e -> {
+      Long k = e.getKey();
 
-          // Conversão para inteiro de 64-bits
-          // seguido por conversão para 32-bits
-          Integer v = (int) Long.parseLong(e.getValue());
+      // Conversão para inteiro de 64-bits
+      // seguido por conversão para 32-bits
+      Integer v = (int) Long.parseLong(e.getValue());
 
-          return new AbstractMap.SimpleEntry<Integer, Integer>(k, v);
-        })
-        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+      return new AbstractMap.SimpleEntry<Long, Integer>(k, v);
+    }).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
   }
 }

@@ -24,13 +24,13 @@ public class CLITest {
     }
 
     @Override
-    public void loadData(Map<Integer, Integer> data) {
+    public void loadData(Map<Long, Integer> data) {
       System.out.println("Carregando dados...");
       System.out.println(data);
     }
 
     @Override
-    public void loadMemory(Map<Integer, Integer> mem) {
+    public void loadMemory(Map<Long, Integer> mem) {
       System.out.println("Carregando memória principal...");
       System.out.println(mem);
     }
@@ -72,8 +72,8 @@ public class CLITest {
     }
 
     @Override
-    public Map<Integer, Integer> memory() {
-      return Map.of(40921, 100, 49127, 0);
+    public Map<Long, Integer> memory() {
+      return Map.of(40921L, 100, 49127L, 0);
     }
 
   }

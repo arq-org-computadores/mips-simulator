@@ -114,7 +114,7 @@ public final class Main {
    */
   private static OutputJSON getCurrentResults() {
     Map<String, Integer> registers = Main.simulator.registers();
-    Map<Integer, Integer> memory = Main.simulator.memory();
+    Map<Long, Integer> memory = Main.simulator.memory();
     String hex = Main.simulator.toHex();
     String assembly = Main.simulator.toAssembly();
     String stdout = Main.simulator.output();

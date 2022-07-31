@@ -29,14 +29,14 @@ public interface IMIPS32 {
    * 
    * @param data um mapa de inteiro (endereço) para inteiro (valor).
    */
-  void loadData(Map<Integer, Integer> data);
+  void loadData(Map<Long, Integer> data);
 
   /**
    * Carrega dados no segmento `data` da memória principal.
    * 
    * @param mem um mapa de inteiro (endereço) para inteiro (valor).
    */
-  void loadMemory(Map<Integer, Integer> mem);
+  void loadMemory(Map<Long, Integer> mem);
 
   /**
    * Carrega dados nos registros.
@@ -94,5 +94,5 @@ public interface IMIPS32 {
    * 
    * @return Mapa de inteiro (endereço) para inteiro (valor).
    */
-  Map<Integer, Integer> memory(); 
+  Map<Long, Integer> memory(); 
 }
