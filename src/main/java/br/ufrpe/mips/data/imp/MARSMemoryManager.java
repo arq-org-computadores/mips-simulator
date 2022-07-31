@@ -3,7 +3,6 @@ package br.ufrpe.mips.data.imp;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.IMemoryManager;
