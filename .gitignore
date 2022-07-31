@@ -7,3 +7,7 @@
 # Maven
 out/
 target/
+
+# Outros
+input/
+output/
