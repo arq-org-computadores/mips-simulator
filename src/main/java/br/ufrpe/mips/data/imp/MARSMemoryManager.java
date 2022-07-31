@@ -32,15 +32,20 @@ public final class MARSMemoryManager implements IMemoryManager {
 
     private static long textBegin = 0x00400000;
     private static long textLimit = 0x0ffffffc;
+
     private static long dataBegin = 0x10000000;
     private static long dataLimit = 0x7fffffff;
+
+    private static long stackBegin = 0x7ffffffc;
+    private static long stackLimit = 0x10040000;
 
     public static MemoryLocationType typeFromAddress(long address) {
       if (address >= textBegin && address <= textLimit) {
         return MemoryLocationType.TEXT_SEGMENT;
-      }
-      else if (address >= dataBegin && address <= dataLimit) {
+      } else if (address >= dataBegin && address <= dataLimit) {
         return MemoryLocationType.STATIC_DATA;
+      } else if (address >= stackLimit && address <= stackBegin) {
+        return MemoryLocationType.STACK_SEGMENT;
       }
 
       return MemoryLocationType.RESERVED;
