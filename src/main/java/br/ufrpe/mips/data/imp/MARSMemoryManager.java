@@ -1,5 +1,6 @@
 package br.ufrpe.mips.data.imp;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -84,7 +85,11 @@ public final class MARSMemoryManager implements IMemoryManager {
 
   @Override
   public List<IMemoryLocation<Byte>> byteMemoryLocations() {
-    return this.memory.entrySet().stream().map(Entry::getValue).collect(Collectors.toList());
+    List<IMemoryLocation<Byte>> l = new ArrayList<>();
+
+    l.addAll(this.memory.values());
+
+    return l;
   }
 
   @Override
@@ -144,6 +149,18 @@ public final class MARSMemoryManager implements IMemoryManager {
 
   private static boolean isReserved(long address) {
     return MARSMemoryLayout.typeFromAddress(address) == MemoryLocationType.RESERVED;
+  }
+
+  @Override
+  public List<IRegister> registers() {
+    List<IRegister> regs = new ArrayList<>();
+
+    regs.addAll(this.registers.values());
+    regs.add(this.lo);
+    regs.add(this.hi);
+    regs.add(this.pc);
+
+    return regs;
   }
 
 }
