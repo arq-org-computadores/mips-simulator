@@ -76,4 +76,10 @@ public class MIPS32Processor implements IMIPS32 {
     
   }
 
+  @Override
+  public boolean hasNextInstruction() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
 }

@@ -46,6 +46,13 @@ public interface IMIPS32 {
   void loadRegisters(Map<String, Integer> regs);
 
   /**
+   * Indica se ainda existem instruções para serem executadas.
+   * 
+   * @return true se ainda existem instruções, false do contrário.
+   */
+  boolean hasNextInstruction();
+
+  /**
    * Executa a próxima instrução do segmento `text.
    */
   void runNexInstruction();
