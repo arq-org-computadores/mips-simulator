@@ -30,21 +30,21 @@ public final class MARSMemoryManager implements IMemoryManager {
 
     }
 
-    private static long textBegin = 0x00400000;
-    private static long textLimit = 0x0ffffffc;
+    private static long textBegin = 0x00400000L;
+    private static long textLimit = 0x0ffffffcL;
 
-    private static long dataBegin = 0x10000000;
-    private static long dataLimit = 0x7fffffff;
+    private static long dataBegin = 0x10000000L;
+    private static long dataLimit = 0x7fffffffL;
 
-    private static long stackBegin = 0x7ffffffc;
-    private static long stackLimit = 0x10040000;
+    private static long stackBegin = 0x10040000L;
+    private static long stackLimit = 0x7ffffffcL;
 
     public static MemoryLocationType typeFromAddress(long address) {
       if (address >= textBegin && address <= textLimit) {
         return MemoryLocationType.TEXT_SEGMENT;
       } else if (address >= dataBegin && address <= dataLimit) {
         return MemoryLocationType.STATIC_DATA;
-      } else if (address >= stackLimit && address <= stackBegin) {
+      } else if (address >= stackBegin && address <= stackLimit) {
         return MemoryLocationType.STACK_SEGMENT;
       }
 
@@ -57,14 +57,8 @@ public final class MARSMemoryManager implements IMemoryManager {
     this.memory = new LinkedHashMap<>();
     this.registers = new LinkedHashMap<>();
 
-    for (long i = 0; i <= 0xFFFFFFFF; i++) {
-      MemoryLocationType t = MARSMemoryLayout.typeFromAddress(i);
-      this.memory.put(i, new ByteMemoryLocation(i, t));
-
-      if (i < 32) {
-        int j = (int) i;
-        this.registers.put(j, new Register(RegisterType.REGULAR, j));
-      }
+    for (int i = 0; i < 32; i++) {
+      this.registers.put(i, new Register(RegisterType.REGULAR, i));
     }
 
     this.lo = new Register(RegisterType.LO, -1);
@@ -74,8 +68,15 @@ public final class MARSMemoryManager implements IMemoryManager {
 
   @Override
   public IMemoryLocation<Byte> getByteMemoryLocationFromAddress(long address) {
-    if (!this.memory.containsKey(address)) {
+    if (MARSMemoryManager.isReserved(address)) {
       return null;
+    }
+
+    if (!this.memory.containsKey(address)) {
+      MemoryLocationType t = MARSMemoryLayout.typeFromAddress(address);
+      ByteMemoryLocation l = new ByteMemoryLocation(address, t);
+
+      this.memory.put(address, l);
     }
 
     return this.memory.get(address);
@@ -94,18 +95,19 @@ public final class MARSMemoryManager implements IMemoryManager {
 
   @Override
   public IMemoryLocation<Integer> getWordMemoryLocationFromAddress(long address) {
-    if (!this.isAddressWordAligned(address) || this.memory.containsKey(address)) {
-      // Caso não seja um endereço de palavra ou não exista, retorna
+    if (!this.isAddressWordAligned(address) || MARSMemoryManager.isReserved(address)) {
+      // Caso não seja um endereço de palavra ou seja reservado, retorna
       return null;
     }
 
     // Encapsulando 4 células de 8 bits nessa localização de memória
-    ByteMemoryLocation c0 = this.memory.get(address);
-    ByteMemoryLocation c1 = this.memory.get(address + 1);
-    ByteMemoryLocation c2 = this.memory.get(address + 2);
-    ByteMemoryLocation c3 = this.memory.get(address + 3);
+    IMemoryLocation<Byte> c0 = this.getByteMemoryLocationFromAddress(address);
+    IMemoryLocation<Byte> c1 = this.getByteMemoryLocationFromAddress(address + 1);
+    IMemoryLocation<Byte> c2 = this.getByteMemoryLocationFromAddress(address + 2);
+    IMemoryLocation<Byte> c3 = this.getByteMemoryLocationFromAddress(address + 3);
 
-    return new WordMemoryLocation(c0, c1, c2, c3);
+    return new WordMemoryLocation((ByteMemoryLocation) c0, (ByteMemoryLocation) c1,
+        (ByteMemoryLocation) c2, (ByteMemoryLocation) c3);
   }
 
   @Override
@@ -138,6 +140,10 @@ public final class MARSMemoryManager implements IMemoryManager {
   @Override
   public IRegister getPC() {
     return this.pc;
+  }
+
+  private static boolean isReserved(long address) {
+    return MARSMemoryLayout.typeFromAddress(address) == MemoryLocationType.RESERVED;
   }
 
 }
