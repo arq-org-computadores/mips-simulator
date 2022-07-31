@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.io.FileUtils;
 
+import com.fasterxml.jackson.core.PrettyPrinter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import br.ufrpe.mips.presentation.entity.InputJSON;
@@ -19,6 +21,7 @@ public final class Main {
   private static Path inputPath = Path.of("input");
   private static Path outputPath = Path.of("output");
   private static ObjectMapper mapper = new ObjectMapper();
+  private static PrettyPrinter printer = new DefaultPrettyPrinter().withoutSpacesInObjectEntries();
   private static IMIPS32 simulator;
 
   private Main() {
@@ -40,8 +43,7 @@ public final class Main {
   }
 
   /**
-   * Recebe um caminho para um arquivo JSON
-   * e executa o algoritmo representado por ele no simulador.
+   * Recebe um caminho para um arquivo JSON e executa o algoritmo representado por ele no simulador.
    * 
    * Salva o resultado da execução em um arquivo JSON de saída.
    * 
@@ -74,25 +76,20 @@ public final class Main {
 
     // --- FINALIZAÇÃO E ESCRITA DOS RESULTADOS ---
     try {
-      String result = Main.mapper
-          .writerWithDefaultPrettyPrinter()
-          .writeValueAsString(Main.getCurrentResults());
+      String result = Main.mapper.writer(Main.printer).writeValueAsString(Main.getCurrentResults());
 
       String fname = Main.outputFileName(p.getFileName().toString());
-      Path out = Path.of(Main.outputPath.toString(),
-          Main.outputFileName(fname));
+      Path out = Path.of(Main.outputPath.toString(), fname);
 
-      FileUtils.writeStringToFile(out.toFile(),
-          result,
-          "UTF-8");
+      FileUtils.writeStringToFile(out.toFile(), result, "UTF-8");
     } catch (IOException e) {
       // Silent catch.
     }
   }
 
   /**
-   * Método utilitário, carrega todos os dados necessários
-   * no simulador na memória: registradores e memória principal.
+   * Método utilitário, carrega todos os dados necessários no simulador na memória: registradores e
+   * memória principal.
    * 
    * @param input arquivo de entrada contendo todos os dados.
    */
@@ -111,8 +108,7 @@ public final class Main {
   }
 
   /**
-   * Método utilitário, converte o estado atual do simulador
-   * para um {@link OutputJSON}.
+   * Método utilitário, converte o estado atual do simulador para um {@link OutputJSON}.
    * 
    * @return {@link OutputJSON} representando o estado atual do simulador.
    */
@@ -131,15 +127,11 @@ public final class Main {
     outputJSON.stdout = stdout;
 
     // Adicionando todos registradores que possuem valor != 0
-    outputJSON.registers = registers.entrySet()
-        .stream()
-        .filter(e -> e.getValue() != 0)
+    outputJSON.registers = registers.entrySet().stream().filter(e -> e.getValue() != 0)
         .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
 
     // Adicionando todas células de memória que possuem valor != 0
-    outputJSON.memory = memory.entrySet()
-        .stream()
-        .filter(e -> e.getValue() != 0)
+    outputJSON.memory = memory.entrySet().stream().filter(e -> e.getValue() != 0)
         .collect(Collectors.toMap(e -> e.getKey().toString(), Entry::getValue));
 
     return outputJSON;
@@ -152,6 +144,7 @@ public final class Main {
    * @return String formatada como "<Grupo>.<Alg>.output.json".
    */
   private static String outputFileName(String algorithm) {
+    algorithm = algorithm.replaceAll(".json", "");
     return String.format("%s.%s.output.json", "Grupo", algorithm);
   }
 }
