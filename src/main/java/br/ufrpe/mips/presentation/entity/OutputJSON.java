@@ -1,6 +1,6 @@
 package br.ufrpe.mips.presentation.entity;
 
-import java.util.Map;
+import java.util.LinkedHashMap;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -16,9 +16,9 @@ public class OutputJSON {
   public String stdout;
 
   @JsonProperty("regs")
-  public Map<String, Integer> registers;
+  public LinkedHashMap<String, Integer> registers;
 
   @JsonProperty("mem")
-  public Map<String, Integer> memory;
+  public LinkedHashMap<String, Integer> memory;
 
 }
