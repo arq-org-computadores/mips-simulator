@@ -50,17 +50,30 @@ public final class MIPSDisassembler {
     int[] f = MIPSDisassembler.getFields(binary, type, opcode);
     InstructionFields fields = new InstructionFields(type, f);
 
+    // Variável auxiliar para ser utilizada dentro da função lambda
+    InstructionFields fFields = fields;
+
     // Obter instrução
     MIPSInstruction instruction = Arrays.stream(MIPSInstruction.values())
         .filter(i -> {
           boolean eqOpcode = i.opcode() == opcode;
           boolean eqType = i.type() == type;
           boolean eqFunc = (i.funct().isEmpty() && i.type() != InstructionType.R)
-              || (i.funct().get() == fields.asRField().funct());
-          return eqOpcode && eqType && eqFunc;
+              || (i.funct().get() == fFields.asRField().funct());
+          boolean syscall = (i.opcode() == opcode) &&
+              (i.type() == InstructionType.SYSCALL) &&
+              !i.funct().isEmpty() &&
+              (i.funct().get() == fFields.asRField().funct());
+          return (eqOpcode && eqType && eqFunc) || syscall;
         })
         .findFirst()
         .orElseThrow();
+
+    // Caso a instrução seja um SYSCALL, atualizar tipo.
+    if (instruction == MIPSInstruction.SYSCALL) {
+      fields = new InstructionFields(InstructionType.SYSCALL, fields.fields());
+    }
+
     String assembly = assemblyFromInstruction(instruction, fields);
 
     return new AssemblyInstruction(assembly, instruction, fields);
@@ -96,6 +109,7 @@ public final class MIPSDisassembler {
 
     return switch (instruction) {
       case ADD -> "add $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
+      case SYSCALL -> "syscall";
       default -> "";
     };
   }
