@@ -58,7 +58,7 @@ public class CLITest {
 
     @Override
     public String toAssembly() {
-      return "add $0 $1 $2";
+      return "add $0, $1, $2";
     }
 
     @Override
@@ -68,12 +68,12 @@ public class CLITest {
 
     @Override
     public Map<String, Integer> registers() {
-      return Map.of("$0", 0, "$12", 50);
+      return Map.of("$15", 0, "$12", 50, "lo", 2048, "$5", -152, "$1", 245, "$14", 100, "pc", 50952, "hi", 98419);
     }
 
     @Override
     public Map<Long, Integer> memory() {
-      return Map.of(40921L, 100, 49127L, 0);
+      return Map.of(40921L, 100, 49127L, 0, 4198471879L, 4872, 666666L, 2134, 88888L, 7411);
     }
 
   }
