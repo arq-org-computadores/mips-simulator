@@ -4,7 +4,11 @@ MIPS32 é um conjunto de instruções 32 bits. Esse projeto permite executar dif
 
 ## Arquitetura do Sistema
 
-![Arquitetura em camadas](docs/imgs/architecture.png)
+```mermaid
+flowchart TD
+    A(Camada de Apresentação) -->|IMIPS32| B(Camada de Simulação)
+    B --> |IMemoryManager| C(Camada de Dados)
+```
 
 O Simulador é organizado em 3 camadas distintas:
 
