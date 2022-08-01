@@ -8,7 +8,7 @@ package br.ufrpe.mips.simulator.utils;
  */
 public final class MIPSDisassembler {
 
-  static record AssemblyInstruction(String assembly,
+  public static record AssemblyInstruction(String assembly,
       MIPSInstruction instruction,
       InstructionFields fields) {
   }
