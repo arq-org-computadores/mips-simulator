@@ -81,13 +81,20 @@ public final class MIPSDisassembler {
 
   private static int[] getFields(String binary, InstructionType type, int opcode) {
     return switch (type) {
-      case R -> new int[] { opcode,
+      case R, SYSCALL -> new int[] { opcode,
           fromBinary(binary, 6, 10),
           fromBinary(binary, 11, 15),
           fromBinary(binary, 16, 20),
           fromBinary(binary, 21, 25),
           fromBinary(binary, 26, 31) };
-      default -> null;
+      case I -> new int[] { opcode,
+          fromBinary(binary, 6, 10),
+          fromBinary(binary, 11, 15),
+          fromBinary(binary, 16, 31)
+      };
+      case J -> new int[] { opcode,
+          fromBinary(binary, 6, 31)
+      };
     };
   }
 
@@ -101,14 +108,15 @@ public final class MIPSDisassembler {
     JField j = null;
 
     switch (fields.type()) {
-      case R -> r = fields.asRField();
+      case R, SYSCALL -> r = fields.asRField();
       case I -> i = fields.asIField();
       case J -> j = fields.asJField();
-      case SYSCALL -> r = fields.asRField();
     }
 
     return switch (instruction) {
       case ADD -> "add $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
+      case ADDI -> "addi $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
+      case J -> "j %d".formatted(Integer.toUnsignedLong(j.address()));
       case SYSCALL -> "syscall";
       default -> "";
     };
