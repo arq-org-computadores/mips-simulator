@@ -11,8 +11,12 @@ import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.IMemoryManager;
 import br.ufrpe.mips.data.IRegister;
 import br.ufrpe.mips.simulator.IMIPS32;
+import br.ufrpe.mips.simulator.utils.InstructionType;
 import br.ufrpe.mips.simulator.utils.MIPSDisassembler;
+import br.ufrpe.mips.simulator.utils.MIPSInstruction;
 import br.ufrpe.mips.simulator.utils.RegisterMapper;
+import br.ufrpe.mips.simulator.utils.InstructionFields.IField;
+import br.ufrpe.mips.simulator.utils.InstructionFields.JField;
 import br.ufrpe.mips.simulator.utils.InstructionFields.RField;
 import br.ufrpe.mips.simulator.utils.MIPSDisassembler.AssemblyInstruction;
 
@@ -22,6 +26,11 @@ import br.ufrpe.mips.simulator.utils.MIPSDisassembler.AssemblyInstruction;
  * @version 1.0
  */
 public class MIPS32Processor implements IMIPS32 {
+
+  private static List<MIPSInstruction> branchesJump = List.of(MIPSInstruction.J,
+      MIPSInstruction.JAL, MIPSInstruction.BEQ, MIPSInstruction.BGTZ,
+      MIPSInstruction.BLEZ, MIPSInstruction.BLTZ, MIPSInstruction.BNE,
+      MIPSInstruction.JR);
 
   // Memória principal e registradores
   private IMemoryManager memory;
@@ -163,6 +172,9 @@ public class MIPS32Processor implements IMIPS32 {
 
   @Override
   public void runNexInstruction() {
+    // Limpando saída da instrução anterior
+    this.output = "";
+
     // Obter localização atual do programa
     long address = Integer.toUnsignedLong(this.memory.getPC().read());
 
@@ -173,16 +185,19 @@ public class MIPS32Processor implements IMIPS32 {
 
     switch (this.lastInstruction.instruction()) {
       case ADD -> this.runADD();
+      case ADDI -> this.runADDI();
+      case J -> this.runJ();
       default -> System.out.println("Instrução não implementada");
     }
 
-    // OBS:. Em caso de desvios, daqui pra baixo funciona de forma diferente.
+    // Só atualizar PC caso não seja instrução de desvio
+    if (!MIPS32Processor.branchesJump.contains(this.lastInstruction.instruction())) {
+      // Ir para próxima instrução
+      address += 4;
 
-    // Ir para próxima instrução
-    address += 4;
-
-    // Atualizar PC
-    this.memory.getPC().write((int) address);
+      // Atualizar PC
+      this.memory.getPC().write((int) address);
+    }
   }
 
   @Override
@@ -222,6 +237,37 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Armazenar resultado
     dest.write(v1 + v2);
+  }
+
+  private void runADDI() {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = this.lastInstruction.fields().asIField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
+    IRegister r1 = this.memory.getRegisterFromNumber(iField.rs());
+
+    // Obtendo valores
+    int v1 = r1.read();
+    int immediate = iField.immediate();
+
+    // Checar por overflow
+    try {
+      Math.addExact(v1, immediate);
+    } catch (ArithmeticException e) {
+      this.output = "overflow";
+    }
+
+    // Armazenar resultado
+    dest.write(v1 + immediate);
+  }
+
+  private void runJ() {
+    // Lendo campos como sendo de uma instrução tipo J
+    JField jField = this.lastInstruction.fields().asJField();
+
+    // Atualizando PC
+    this.memory.getPC().write(jField.address());
   }
 
 }
