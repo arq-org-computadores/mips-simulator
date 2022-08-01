@@ -112,8 +112,7 @@ public class MIPS32Processor implements IMIPS32 {
 
   @Override
   public Map<String, Integer> registers() {
-    List<IRegister> registers = this.memory.registers().stream().filter(r -> r.read() != 0)
-        .collect(Collectors.toList());
+    List<IRegister> registers = this.memory.registers();
     IRegister pc = this.memory.getPC();
     IRegister lo = this.memory.getLO();
     IRegister hi = this.memory.getHI();
@@ -124,15 +123,15 @@ public class MIPS32Processor implements IMIPS32 {
     regs = new LinkedHashMap<>(regs);
 
     if (pc.read() != 0) {
-      regs.put("$pc", pc.read());
+      regs.put("pc", pc.read());
     }
 
     if (lo.read() != 0) {
-      regs.put("$lo", lo.read());
+      regs.put("lo", lo.read());
     }
 
     if (hi.read() != 0) {
-      regs.put("$hi", hi.read());
+      regs.put("hi", hi.read());
     }
 
     return regs;
@@ -141,8 +140,7 @@ public class MIPS32Processor implements IMIPS32 {
   @Override
   public Map<Long, Integer> memory() {
 
-    return this.memory.wordMemoryLocations().stream().filter(l -> l.read() != 0)
-        .sorted(Comparator.comparing(l -> l.address()))
+    return this.memory.wordMemoryLocations().stream()
         .collect(Collectors.toMap(l -> l.address(), l -> l.read()));
   }
 
