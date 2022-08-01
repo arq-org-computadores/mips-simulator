@@ -56,15 +56,20 @@ public final class MIPSDisassembler {
     // Obter instrução
     MIPSInstruction instruction = Arrays.stream(MIPSInstruction.values())
         .filter(i -> {
-          boolean eqOpcode = i.opcode() == opcode;
-          boolean eqType = i.type() == type;
-          boolean eqFunc = (i.funct().isEmpty() && i.type() != InstructionType.R)
-              || (i.funct().get() == fFields.asRField().funct());
-          boolean syscall = (i.opcode() == opcode) &&
-              (i.type() == InstructionType.SYSCALL) &&
-              !i.funct().isEmpty() &&
-              (i.funct().get() == fFields.asRField().funct());
-          return (eqOpcode && eqType && eqFunc) || syscall;
+          // Checando se as informações batem
+          if (i.opcode() == opcode) {
+            if (i.type() == type) {
+              if (i.type() == InstructionType.R) {
+                return i.funct().get() == fFields.asRField().funct();
+              }
+
+              return true;
+            } else if (i.type() == InstructionType.SYSCALL && type == InstructionType.R) {
+              return i.funct().get() == fFields.asRField().funct();
+            }
+          }
+
+          return false;
         })
         .findFirst()
         .orElseThrow();
@@ -90,10 +95,10 @@ public final class MIPSDisassembler {
       case I -> new int[] { opcode,
           fromBinary(binary, 6, 10),
           fromBinary(binary, 11, 15),
-          fromBinary(binary, 16, 31)
+          (short) fromBinary(binary, 16, 31) // constante 16-bits
       };
       case J -> new int[] { opcode,
-          fromBinary(binary, 6, 31)
+          4 * fromBinary(binary, 6, 31) // endereço real é 4 vezes o valor do campo
       };
     };
   }

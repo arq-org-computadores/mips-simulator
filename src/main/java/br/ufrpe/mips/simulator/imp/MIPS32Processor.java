@@ -11,7 +11,6 @@ import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.IMemoryManager;
 import br.ufrpe.mips.data.IRegister;
 import br.ufrpe.mips.simulator.IMIPS32;
-import br.ufrpe.mips.simulator.utils.InstructionType;
 import br.ufrpe.mips.simulator.utils.MIPSDisassembler;
 import br.ufrpe.mips.simulator.utils.MIPSInstruction;
 import br.ufrpe.mips.simulator.utils.RegisterMapper;
