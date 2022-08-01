@@ -9,15 +9,15 @@ package br.ufrpe.mips.simulator.utils;
  */
 public record InstructionFields(InstructionType type, int[] fields) {
 
-  static record RField(int opcode, int rs, int rt, int rd, int shamt, int funct) {
+  public static record RField(int opcode, int rs, int rt, int rd, int shamt, int funct) {
 
   }
 
-  static record IField(int opcode, int rs, int rt, int immediate) {
+  public static record IField(int opcode, int rs, int rt, int immediate) {
 
   }
 
-  static record JField(int opcode, int address) {
+  public static record JField(int opcode, int address) {
 
   }
 

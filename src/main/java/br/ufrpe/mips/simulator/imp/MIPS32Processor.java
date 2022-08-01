@@ -11,7 +11,9 @@ import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.IMemoryManager;
 import br.ufrpe.mips.data.IRegister;
 import br.ufrpe.mips.simulator.IMIPS32;
+import br.ufrpe.mips.simulator.utils.MIPSDisassembler;
 import br.ufrpe.mips.simulator.utils.RegisterMapper;
+import br.ufrpe.mips.simulator.utils.InstructionFields.RField;
 import br.ufrpe.mips.simulator.utils.MIPSDisassembler.AssemblyInstruction;
 
 /**
@@ -166,6 +168,18 @@ public class MIPS32Processor implements IMIPS32 {
     // Obter localização atual do programa
     long address = Integer.toUnsignedLong(this.memory.getPC().read());
 
+    // Obter instrução atual
+    int instruction = this.memory.getWordMemoryLocationFromAddress(address).read();
+    String hex = Integer.toHexString(instruction);
+    this.lastInstruction = MIPSDisassembler.toAssembly("0x%s".formatted(hex));
+
+    switch (this.lastInstruction.instruction()) {
+      case ADD -> this.runADD();
+      default -> System.out.println("Instrução não implementada");
+    }
+
+    // OBS:. Em caso de desvios, daqui pra baixo funciona de forma diferente.
+
     // Ir para próxima instrução
     address += 4;
 
@@ -186,6 +200,30 @@ public class MIPS32Processor implements IMIPS32 {
   @Override
   public String toHex() {
     return this.hex;
+  }
+
+  private void runADD() {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = this.lastInstruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister s1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister s2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    // Lendo valores dos registradores
+    int v1 = s1.read();
+    int v2 = s2.read();
+
+    // Checar por overflow
+    try {
+      Math.addExact(v1, v2);
+    } catch (ArithmeticException e) {
+      this.output = "overflow";
+    }
+
+    // Armazenar resultado
+    dest.write(v1 + v2);
   }
 
 }
