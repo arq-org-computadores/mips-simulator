@@ -156,9 +156,6 @@ public final class MARSMemoryManager implements IMemoryManager {
     List<IRegister> regs = new ArrayList<>();
 
     regs.addAll(this.registers.values());
-    regs.add(this.lo);
-    regs.add(this.hi);
-    regs.add(this.pc);
 
     return regs;
   }
