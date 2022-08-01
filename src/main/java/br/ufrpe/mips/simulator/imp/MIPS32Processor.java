@@ -174,13 +174,16 @@ public class MIPS32Processor implements IMIPS32 {
     // Limpando saída da instrução anterior
     this.output = "";
 
+    // Limpando instrução anterior
+    this.hex = "";
+
     // Obter localização atual do programa
     long address = Integer.toUnsignedLong(this.memory.getPC().read());
 
     // Obter instrução atual
     int instruction = this.memory.getWordMemoryLocationFromAddress(address).read();
-    String hex = Integer.toHexString(instruction);
-    this.lastInstruction = MIPSDisassembler.toAssembly("0x%s".formatted(hex));
+    this.hex = "0x%s".formatted(Integer.toHexString(instruction));
+    this.lastInstruction = MIPSDisassembler.toAssembly(this.hex);
 
     switch (this.lastInstruction.instruction()) {
       case ADD -> this.runADD();
