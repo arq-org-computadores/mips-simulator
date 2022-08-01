@@ -3,6 +3,8 @@ package br.ufrpe.mips.presentation.cli;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
@@ -43,7 +45,8 @@ public final class Main {
   }
 
   /**
-   * Recebe um caminho para um arquivo JSON e executa o algoritmo representado por ele no simulador.
+   * Recebe um caminho para um arquivo JSON e executa o algoritmo representado por
+   * ele no simulador.
    * 
    * Salva o resultado da execução em um arquivo JSON de saída.
    * 
@@ -88,7 +91,8 @@ public final class Main {
   }
 
   /**
-   * Método utilitário, carrega todos os dados necessários no simulador na memória: registradores e
+   * Método utilitário, carrega todos os dados necessários no simulador na
+   * memória: registradores e
    * memória principal.
    * 
    * @param input arquivo de entrada contendo todos os dados.
@@ -108,7 +112,8 @@ public final class Main {
   }
 
   /**
-   * Método utilitário, converte o estado atual do simulador para um {@link OutputJSON}.
+   * Método utilitário, converte o estado atual do simulador para um
+   * {@link OutputJSON}.
    * 
    * @return {@link OutputJSON} representando o estado atual do simulador.
    */
@@ -127,12 +132,35 @@ public final class Main {
     outputJSON.stdout = stdout;
 
     // Adicionando todos registradores que possuem valor != 0
-    outputJSON.registers = registers.entrySet().stream().filter(e -> e.getValue() != 0)
-        .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+    LinkedHashMap<String, Integer> regsMap = new LinkedHashMap<>();
+    registers.entrySet().stream()
+        .sorted(Comparator.comparing(e -> {
+          String k = e.getKey();
+          if (k.equals("pc")) {
+            // Depois de todos registradores
+            return 900;
+          } else if (k.equals("hi")) {
+            // Depois de pc
+            return 901;
+          } else if (k.equals("lo")) {
+            // Depois de hi
+            return 902;
+          } else {
+            // De acordo com número do registrador
+            return Integer.parseInt(k.replace("$", ""));
+          }
+        }))
+        .filter(e -> e.getValue() != 0)
+        .forEachOrdered(e -> regsMap.put(e.getKey(), e.getValue()));
+    outputJSON.registers = regsMap;
 
     // Adicionando todas células de memória que possuem valor != 0
-    outputJSON.memory = memory.entrySet().stream().filter(e -> e.getValue() != 0)
-        .collect(Collectors.toMap(e -> e.getKey().toString(), Entry::getValue));
+    LinkedHashMap<String, Integer> memMap = new LinkedHashMap<>();
+    memory.entrySet().stream()
+        .sorted(Comparator.comparing(Entry::getKey))
+        .filter(e -> e.getValue() != 0)
+        .forEachOrdered(e -> memMap.put(e.getKey().toString(), e.getValue()));
+    outputJSON.memory = memMap;
 
     return outputJSON;
   }
