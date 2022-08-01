@@ -13,7 +13,8 @@ import br.ufrpe.mips.data.utils.RegisterType;
 /**
  * Classe que representa o gerenciador de memória do simulador MARS MIPS.
  * 
- * A memória é divida em diferentes segmentos que possuem endereçamento base e limite.
+ * A memória é divida em diferentes segmentos que possuem endereçamento base e
+ * limite.
  * 
  * Cada célula de memória armazena 1 byte.
  * 
@@ -30,14 +31,14 @@ public final class MARSMemoryManager implements IMemoryManager {
 
     }
 
-    private static long textBegin = 0x00400000L;
+    static long textBegin = 0x00400000L;
     private static long textLimit = 0x0ffffffcL;
 
-    private static long dataBegin = 0x10000000L;
-    private static long dataLimit = 0x7fffffffL;
+    static long dataBegin = 0x10000000L;
+    static long dataLimit = 0x7fffffffL;
 
-    private static long stackBegin = 0x10040000L;
-    private static long stackLimit = 0x7ffffffcL;
+    static long stackBegin = 0x10040000L;
+    static long stackLimit = 0x7ffffffcL;
 
     public static MemoryLocationType typeFromAddress(long address) {
       if (address >= textBegin && address <= textLimit) {
@@ -155,11 +156,42 @@ public final class MARSMemoryManager implements IMemoryManager {
     List<IRegister> regs = new ArrayList<>();
 
     regs.addAll(this.registers.values());
-    regs.add(this.lo);
-    regs.add(this.hi);
-    regs.add(this.pc);
 
     return regs;
+  }
+
+  @Override
+  public void clear() {
+    // Limpar registradores comuns
+    for (Register reg : this.registers.values()) {
+      reg.write(0);
+    }
+
+    // Limpar registradores especiais
+    this.hi.write(0);
+    this.lo.write(0);
+    this.pc.write(0);
+
+    // Limpar memória principal
+    this.memory.clear();
+  }
+
+  @Override
+  public long textBaseAddress() {
+    // Endereço base de texto/instruções.
+    return MARSMemoryLayout.textBegin;
+  }
+
+  @Override
+  public long dataBaseAddress() {
+    // Endereço base de dados
+    return MARSMemoryLayout.dataBegin;
+  }
+
+  @Override
+  public long stackBaseAddress() {
+    // O stack cresce de "cima" para "baixo".
+    return MARSMemoryLayout.stackLimit;
   }
 
 }
