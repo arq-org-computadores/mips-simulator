@@ -193,6 +193,8 @@ public class MIPS32Processor implements IMIPS32 {
       case ADD -> this.runADD();
       case ADDI -> this.runADDI();
       case J -> this.runJ();
+      case SW -> this.runSW();
+      case LW -> this.runLW();
       default -> System.out.println("Instrução não implementada");
     }
 
@@ -274,6 +276,50 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Atualizando PC
     this.memory.getPC().write(jField.address());
+  }
+
+  private void runSW() {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = this.lastInstruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister data = this.memory.getRegisterFromNumber(iField.rt());
+    IRegister r = this.memory.getRegisterFromNumber(iField.rs());
+
+    // Obtendo endereço base e offset
+    long baseAddress = Integer.toUnsignedLong(r.read());
+    int offset = iField.immediate();
+
+    // Calculando novo endereço
+    long address = baseAddress + offset;
+
+    // Obtendo localização de memória com 4 bytes
+    IMemoryLocation<Integer> l = this.memory.getWordMemoryLocationFromAddress(address);
+
+    // Escrevendo o valor do registrador na memória
+    l.write(data.read());
+  }
+
+  private void runLW() {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = this.lastInstruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
+    IRegister r = this.memory.getRegisterFromNumber(iField.rs());
+
+    // Obtendo endereço base e offset
+    long baseAddress = Integer.toUnsignedLong(r.read());
+    int offset = iField.immediate();
+
+    // Calculando novo endereço
+    long address = baseAddress + offset;
+
+    // Obtendo localização de memória com 4 bytes
+    IMemoryLocation<Integer> l = this.memory.getWordMemoryLocationFromAddress(address);
+
+    // Escrevendo valor armazenado nessa posição ao registrador
+    dest.write(l.read());
   }
 
 }
