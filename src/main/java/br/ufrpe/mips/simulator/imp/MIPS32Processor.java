@@ -204,6 +204,7 @@ public class MIPS32Processor implements IMIPS32 {
       case LW -> this.runLW();
       case JR -> this.runJR();
       case JAL -> this.runJAL();
+      case BEQ -> this.runBEQ();
       default -> System.out.println("Instrução não implementada");
     }
 
@@ -357,4 +358,29 @@ public class MIPS32Processor implements IMIPS32 {
     dest.write(l.read());
   }
 
+  private void runBEQ() {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = this.lastInstruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
+    IRegister rt = this.memory.getRegisterFromNumber(iField.rt());
+
+    long offset = 4L;
+
+    // Caso os registradores possuam mesmo valor, podemo entrar
+    // na branch desejada.
+    if (rs.read() == rt.read()) {
+      offset += iField.immediate() * 4L;
+    }
+
+    // Obter localização atual do programa
+    long address = Integer.toUnsignedLong(this.memory.getPC().read());
+
+    // Atualizar nova localização
+    address += offset;
+
+    // Atualizar PC para nova localização
+    this.memory.getPC().write((int) address);
+  }
 }
