@@ -125,6 +125,7 @@ public final class MIPSDisassembler {
       case LW -> "lw $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
       case SW -> "sw $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
       case JR -> "jr $%d".formatted(r.rd());
+      case JAL -> "jal %d".formatted(Integer.toUnsignedLong(j.address()));
       case SYSCALL -> "syscall";
       default -> "";
     };
