@@ -38,6 +38,9 @@ public class MIPS32Processor implements IMIPS32 {
   private String output;
   private String hex;
 
+  // Auxiliares
+  private long lastInstructionAddress;
+
   public MIPS32Processor(IMemoryManager memory) {
     this.memory = memory;
     this.lastInstruction = new AssemblyInstruction("", null, null);
@@ -66,6 +69,7 @@ public class MIPS32Processor implements IMIPS32 {
     this.lastInstruction = new AssemblyInstruction("", null, null);
     this.output = "";
     this.hex = "";
+    this.lastInstructionAddress = 4194304L;
   }
 
   @Override
@@ -156,9 +160,12 @@ public class MIPS32Processor implements IMIPS32 {
     long baseAddress = Integer.toUnsignedLong(this.memory.getPC().read());
 
     for (String hex : hexInstructions) {
+      // Atualizando endereço da última instrução
+      this.lastInstructionAddress = baseAddress + offset;
+
       // Obtendo endereço de memória no segmento `text`
       IMemoryLocation<Integer> l =
-          this.memory.getWordMemoryLocationFromAddress(baseAddress + offset);
+          this.memory.getWordMemoryLocationFromAddress(this.lastInstructionAddress);
 
       // Removendo prefixo 0x caso
       if (hex.contains("0x")) {
@@ -215,9 +222,9 @@ public class MIPS32Processor implements IMIPS32 {
     // Obter localização atual do programa
     long address = Integer.toUnsignedLong(this.memory.getPC().read());
 
-    // Se existir alguma instrução para ser executada, teremos o valor diferente de
-    // 0
-    return this.memory.getWordMemoryLocationFromAddress(address).read() != 0;
+    // Se o endereço de execução for <= que o endereço da última instrução,
+    // ainda temos instruções para serem executadas.
+    return address <= this.lastInstructionAddress;
   }
 
   @Override
@@ -285,16 +292,16 @@ public class MIPS32Processor implements IMIPS32 {
     RField rField = this.lastInstruction.fields().asRField();
 
     // Obtendo registrador
-    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rs());
 
     // Atualizando PC
-    this.memory.getPC().write(dest.number());
+    this.memory.getPC().write(dest.read());
   }
 
   private void runJAL() {
     // Lendo campos como sendo de uma instrução tipo J
     JField jField = this.lastInstruction.fields().asJField();
-    
+
     // Calcular próximo endereço do PC (ou seja, PC + 4)
     long nextPC = Integer.toUnsignedLong(this.memory.getPC().read()) + 4;
 
