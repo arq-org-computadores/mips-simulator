@@ -195,6 +195,7 @@ public class MIPS32Processor implements IMIPS32 {
       case J -> this.runJ();
       case SW -> this.runSW();
       case LW -> this.runLW();
+      case JR -> this.runJR();
       default -> System.out.println("Instrução não implementada");
     }
 
@@ -276,6 +277,17 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Atualizando PC
     this.memory.getPC().write(jField.address());
+  }
+
+  private void runJR() {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = this.lastInstruction.fields().asRField();
+
+    //  Obtendo registrador
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+
+    // Atualizando PC
+    this.memory.getPC().write(dest.number());
   }
 
   private void runSW() {
