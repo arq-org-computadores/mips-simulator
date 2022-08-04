@@ -212,6 +212,7 @@ public class MIPS32Processor implements IMIPS32 {
       case SUBU -> this.runSUBU();
       case MULTU -> this.runMULTU();
       case SLLV -> this.runSLLV();
+      case SRLV -> this.runSRLV();
       default -> System.out.println("Instrução não implementada");
     }
 
@@ -553,6 +554,30 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Calculando resultado
     int result = v1 << v2;
+
+    // Escrevendo na memória
+    dest.write(result);
+  }
+
+  private void runSRLV() {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = this.lastInstruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
+
+    // Lendo valores dos registradores
+    int v2 = rs.read();
+    int v1 = rt.read();
+
+    // Considerando apenas os últimos 5 bits de rt
+    v2 = (v2 << 27) >> 27;
+
+
+    // Calculando resultado
+    int result = v1 >> v2;
 
     // Escrevendo na memória
     dest.write(result);

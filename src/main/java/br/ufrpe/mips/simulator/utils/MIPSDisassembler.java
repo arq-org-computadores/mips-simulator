@@ -134,6 +134,7 @@ public final class MIPSDisassembler {
       case SUBU -> "subu $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case MULTU -> "multu $%d, $%d".formatted(r.rs(), r.rt());
       case SLLV -> "sllv $%d, $%d, $%d".formatted(r.rd(), r.rt(), r.rs());
+      case SRLV -> "srlv $%d, $%d, $%d".formatted(r.rd(), r.rt(), r.rs());
       case SYSCALL -> "syscall";
       default -> "";
     };
