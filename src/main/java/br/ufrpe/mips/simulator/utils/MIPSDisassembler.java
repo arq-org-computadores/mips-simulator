@@ -130,6 +130,7 @@ public final class MIPSDisassembler {
       case BNE -> "bne $%d, $%d, %d".formatted(i.rs(), i.rt(), i.immediate());
       case LB -> "lb $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
       case SB -> "sb $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
+      case DIVU -> "divu $%d, $%d".formatted(r.rs(), r.rt());
       case SYSCALL -> "syscall";
       default -> "";
     };

@@ -208,6 +208,7 @@ public class MIPS32Processor implements IMIPS32 {
       case BNE -> this.runBNE();
       case LB -> this.runLB();
       case SB -> this.runSB();
+      case DIVU -> this.runDIVU();
       default -> System.out.println("Instrução não implementada");
     }
 
@@ -455,5 +456,30 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Atualizar PC para nova localização
     this.memory.getPC().write((int) address);
+  }
+
+  private void runDIVU() {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = this.lastInstruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
+
+    // Lendo valores dos registradores
+    int v1 = rs.read();
+    int v2 = rt.read();
+
+    // Convertendo valores para versões sem sinal
+    long uV1 = Integer.toUnsignedLong(v1);
+    long uV2 = Integer.toUnsignedLong(v2);
+
+    // Calculando quociente e resto
+    long quotient = uV1 / uV2;
+    long remainder = uV1 % uV2;
+
+    // Escrevendo na memória
+    this.memory.getLO().write((int) quotient);
+    this.memory.getHI().write((int) remainder);
   }
 }
