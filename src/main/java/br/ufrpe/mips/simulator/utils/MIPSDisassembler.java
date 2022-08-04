@@ -132,6 +132,7 @@ public final class MIPSDisassembler {
       case SB -> "sb $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
       case DIVU -> "divu $%d, $%d".formatted(r.rs(), r.rt());
       case SUBU -> "subu $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
+      case MULTU -> "multu $%d, $%d".formatted(r.rs(), r.rt());
       case SYSCALL -> "syscall";
       default -> "";
     };
