@@ -11,13 +11,13 @@ import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.IMemoryManager;
 import br.ufrpe.mips.data.IRegister;
 import br.ufrpe.mips.simulator.IMIPS32;
-import br.ufrpe.mips.simulator.utils.MIPSDisassembler;
-import br.ufrpe.mips.simulator.utils.MIPSInstruction;
-import br.ufrpe.mips.simulator.utils.RegisterMapper;
-import br.ufrpe.mips.simulator.utils.InstructionFields.IField;
-import br.ufrpe.mips.simulator.utils.InstructionFields.JField;
-import br.ufrpe.mips.simulator.utils.InstructionFields.RField;
-import br.ufrpe.mips.simulator.utils.MIPSDisassembler.AssemblyInstruction;
+import br.ufrpe.mips.simulator.utils.disassembler.MIPSDisassembler;
+import br.ufrpe.mips.simulator.utils.disassembler.MIPSDisassembler.AssemblyInstruction;
+import br.ufrpe.mips.simulator.utils.instruction.MIPSInstruction;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.IField;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.JField;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.RField;
+import br.ufrpe.mips.simulator.utils.register.RegisterMapper;
 
 /**
  * Essa classe representa um processador MIPS32.

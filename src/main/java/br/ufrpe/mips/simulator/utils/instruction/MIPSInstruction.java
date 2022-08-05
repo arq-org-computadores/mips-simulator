@@ -1,4 +1,4 @@
-package br.ufrpe.mips.simulator.utils;
+package br.ufrpe.mips.simulator.utils.instruction;
 
 import java.util.Optional;
 

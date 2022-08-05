@@ -1,10 +1,13 @@
-package br.ufrpe.mips.simulator.utils;
+package br.ufrpe.mips.simulator.utils.disassembler;
 
 import java.util.Arrays;
 
-import br.ufrpe.mips.simulator.utils.InstructionFields.IField;
-import br.ufrpe.mips.simulator.utils.InstructionFields.JField;
-import br.ufrpe.mips.simulator.utils.InstructionFields.RField;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionFields;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionType;
+import br.ufrpe.mips.simulator.utils.instruction.MIPSInstruction;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.IField;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.JField;
+import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.RField;
 
 /**
  * Classe utilitária que implementa todo processo de tradução de uma instrução

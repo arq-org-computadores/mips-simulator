@@ -1,4 +1,4 @@
-package br.ufrpe.mips.simulator.utils;
+package br.ufrpe.mips.simulator.utils.register;
 
 import java.util.Map;
 
