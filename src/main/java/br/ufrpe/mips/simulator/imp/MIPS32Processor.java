@@ -14,9 +14,11 @@ import br.ufrpe.mips.simulator.IMIPS32;
 import br.ufrpe.mips.simulator.utils.disassembler.MIPSDisassembler;
 import br.ufrpe.mips.simulator.utils.disassembler.MIPSDisassembler.AssemblyInstruction;
 import br.ufrpe.mips.simulator.utils.instruction.MIPSInstruction;
-import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.IField;
-import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.JField;
-import br.ufrpe.mips.simulator.utils.instruction.InstructionFields.RField;
+import br.ufrpe.mips.simulator.utils.operation.ArithmeticLogic;
+import br.ufrpe.mips.simulator.utils.operation.ImmediateAL;
+import br.ufrpe.mips.simulator.utils.operation.JumpBranch;
+import br.ufrpe.mips.simulator.utils.operation.LoadStore;
+import br.ufrpe.mips.simulator.utils.operation.Syscall;
 import br.ufrpe.mips.simulator.utils.register.RegisterMapper;
 
 /**
@@ -39,13 +41,26 @@ public class MIPS32Processor implements IMIPS32 {
   private String hex;
 
   // Auxiliares
-  private long lastInstructionAddress;
+  private long finalInstrAddr;
+
+  // Runners de instruções
+  private ArithmeticLogic al;
+  private ImmediateAL ial;
+  private JumpBranch jb;
+  private LoadStore ls;
+  private Syscall sc;
 
   public MIPS32Processor(IMemoryManager memory) {
     this.memory = memory;
     this.lastInstruction = new AssemblyInstruction("", null, null);
     this.output = "";
     this.hex = "";
+    this.al = new ArithmeticLogic(memory);
+    this.ial = new ImmediateAL(memory);
+    this.jb = new JumpBranch(memory);
+    this.ls = new LoadStore(memory);
+    this.sc = new Syscall(memory);
+
     this.reset();
   }
 
@@ -69,7 +84,7 @@ public class MIPS32Processor implements IMIPS32 {
     this.lastInstruction = new AssemblyInstruction("", null, null);
     this.output = "";
     this.hex = "";
-    this.lastInstructionAddress = 4194304L;
+    this.finalInstrAddr = 4194304L;
   }
 
   @Override
@@ -161,11 +176,11 @@ public class MIPS32Processor implements IMIPS32 {
 
     for (String hex : hexInstructions) {
       // Atualizando endereço da última instrução
-      this.lastInstructionAddress = baseAddress + offset;
+      this.finalInstrAddr = baseAddress + offset;
 
       // Obtendo endereço de memória no segmento `text`
       IMemoryLocation<Integer> l =
-          this.memory.getWordMemoryLocationFromAddress(this.lastInstructionAddress);
+          this.memory.getWordMemoryLocationFromAddress(this.finalInstrAddr);
 
       // Removendo prefixo 0x caso
       if (hex.contains("0x")) {
@@ -195,29 +210,38 @@ public class MIPS32Processor implements IMIPS32 {
     int instruction = this.memory.getWordMemoryLocationFromAddress(address).read();
     this.hex = "0x%s".formatted(Integer.toHexString(instruction));
     this.lastInstruction = MIPSDisassembler.toAssembly(this.hex);
+    AssemblyInstruction i = this.lastInstruction;
 
-    switch (this.lastInstruction.instruction()) {
-      case ADD -> this.runADD();
-      case ADDI -> this.runADDI();
-      case J -> this.runJ();
-      case SW -> this.runSW();
-      case LW -> this.runLW();
-      case JR -> this.runJR();
-      case JAL -> this.runJAL();
-      case BEQ -> this.runBEQ();
-      case BNE -> this.runBNE();
-      case LB -> this.runLB();
-      case SB -> this.runSB();
-      case DIVU -> this.runDIVU();
-      case SUBU -> this.runSUBU();
-      case MULTU -> this.runMULTU();
-      case SLLV -> this.runSLLV();
-      case SRLV -> this.runSRLV();
-      case SRAV -> this.runSRAV();
+    // Criação do buffer de saída para os runners
+    StringBuffer buffer = new StringBuffer();
+
+    // Escolha da instrução
+    switch (i.instruction()) {
+      case ADD -> this.al.ADD(i, buffer);
+      case DIVU -> this.al.DIVU(i, buffer);
+      case SUBU -> this.al.SUBU(i, buffer);
+      case MULTU -> this.al.MULTU(i, buffer);
+      case SLLV -> this.al.SLLV(i, buffer);
+      case SRLV -> this.al.SRLV(i, buffer);
+      case SRAV -> this.al.SRAV(i, buffer);
+      case ADDI -> this.ial.ADDI(i, buffer);
+      case J -> this.jb.J(i, buffer);
+      case JR -> this.jb.JR(i, buffer);
+      case JAL -> this.jb.JAL(i, buffer);
+      case BEQ -> this.jb.BEQ(i, buffer);
+      case BNE -> this.jb.BNE(i, buffer);
+      case SW -> this.ls.SW(i, buffer);
+      case LW -> this.ls.LW(i, buffer);
+      case LB -> this.ls.LB(i, buffer);
+      case SB -> this.ls.SB(i, buffer);
+      case SYSCALL -> this.sc.SYSCALL(i, buffer);
       default -> System.out.println("Instrução não implementada");
     }
 
-    // Só atualizar PC caso não seja instrução de desvio
+    // Obter saídas escritas no Buffer
+    this.output = buffer.toString();
+
+    // Atualização do PC caso não seja instrução de desvio/pulo
     if (!MIPS32Processor.branchesJump.contains(this.lastInstruction.instruction())) {
       // Ir para próxima instrução
       address += 4;
@@ -234,7 +258,7 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Se o endereço de execução for <= que o endereço da última instrução,
     // ainda temos instruções para serem executadas.
-    return address <= this.lastInstructionAddress;
+    return address <= this.finalInstrAddr;
   }
 
   @Override
@@ -242,369 +266,4 @@ public class MIPS32Processor implements IMIPS32 {
     return this.hex;
   }
 
-  private void runADD() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
-    IRegister s1 = this.memory.getRegisterFromNumber(rField.rs());
-    IRegister s2 = this.memory.getRegisterFromNumber(rField.rt());
-
-    // Lendo valores dos registradores
-    int v1 = s1.read();
-    int v2 = s2.read();
-
-    // Checar por overflow
-    try {
-      Math.addExact(v1, v2);
-    } catch (ArithmeticException e) {
-      this.output = "overflow";
-    }
-
-    // Armazenar resultado
-    dest.write(v1 + v2);
-  }
-
-  private void runADDI() {
-    // Lendo campos como sendo de uma instrução tipo I
-    IField iField = this.lastInstruction.fields().asIField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
-    IRegister r1 = this.memory.getRegisterFromNumber(iField.rs());
-
-    // Obtendo valores
-    int v1 = r1.read();
-    int immediate = iField.immediate();
-
-    // Checar por overflow
-    try {
-      Math.addExact(v1, immediate);
-    } catch (ArithmeticException e) {
-      this.output = "overflow";
-    }
-
-    // Armazenar resultado
-    dest.write(v1 + immediate);
-  }
-
-  private void runJ() {
-    // Lendo campos como sendo de uma instrução tipo J
-    JField jField = this.lastInstruction.fields().asJField();
-
-    // Atualizando PC
-    this.memory.getPC().write(jField.address());
-  }
-
-  private void runJR() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Obtendo registrador
-    IRegister dest = this.memory.getRegisterFromNumber(rField.rs());
-
-    // Atualizando PC
-    this.memory.getPC().write(dest.read());
-  }
-
-  private void runJAL() {
-    // Lendo campos como sendo de uma instrução tipo J
-    JField jField = this.lastInstruction.fields().asJField();
-
-    // Calcular próximo endereço do PC (ou seja, PC + 4)
-    long nextPC = Integer.toUnsignedLong(this.memory.getPC().read()) + 4;
-
-    // Salvar próximo endereço no $ra
-    int regNumber = RegisterMapper.regNumberFromLabel("ra");
-    this.memory.getRegisterFromNumber(regNumber).write((int) nextPC);
-
-    // Atualizar PC para novo endereço
-    this.memory.getPC().write(jField.address());
-  }
-
-  private void runSW() {
-    // Lendo campos como sendo de uma instrução tipo I
-    IField iField = this.lastInstruction.fields().asIField();
-
-    // Obtendo registradores envolvidos na operação
-    IRegister data = this.memory.getRegisterFromNumber(iField.rt());
-    IRegister r = this.memory.getRegisterFromNumber(iField.rs());
-
-    // Obtendo endereço base e offset
-    long baseAddress = Integer.toUnsignedLong(r.read());
-    int offset = iField.immediate();
-
-    // Calculando novo endereço
-    long address = baseAddress + offset;
-
-    // Obtendo localização de memória com 4 bytes
-    IMemoryLocation<Integer> l = this.memory.getWordMemoryLocationFromAddress(address);
-
-    // Escrevendo o valor do registrador na memória
-    l.write(data.read());
-  }
-
-  private void runLW() {
-    // Lendo campos como sendo de uma instrução tipo I
-    IField iField = this.lastInstruction.fields().asIField();
-
-    // Obtendo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
-    IRegister r = this.memory.getRegisterFromNumber(iField.rs());
-
-    // Obtendo endereço base e offset
-    long baseAddress = Integer.toUnsignedLong(r.read());
-    int offset = iField.immediate();
-
-    // Calculando novo endereço
-    long address = baseAddress + offset;
-
-    // Obtendo localização de memória com 4 bytes
-    IMemoryLocation<Integer> l = this.memory.getWordMemoryLocationFromAddress(address);
-
-    // Escrevendo valor armazenado nessa posição ao registrador
-    dest.write(l.read());
-  }
-
-  private void runSB() {
-    // Lendo campos como sendo de uma instrução tipo I
-    IField iField = this.lastInstruction.fields().asIField();
-
-    // Obtendo registradores envolvidos na operação
-    IRegister data = this.memory.getRegisterFromNumber(iField.rt());
-    IRegister r = this.memory.getRegisterFromNumber(iField.rs());
-
-    // Obtendo endereço base e offset
-    long baseAddress = Integer.toUnsignedLong(r.read());
-    int offset = iField.immediate();
-
-    // Calculando novo endereço
-    long address = baseAddress + offset;
-
-    // Obtendo localização de memória com 4 bytes
-    IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(address);
-
-    // Escrevendo o valor do registrador na memória
-    l.write((byte) data.read());
-  }
-
-  private void runLB() {
-    // Lendo campos como sendo de uma instrução tipo I
-    IField iField = this.lastInstruction.fields().asIField();
-
-    // Obtendo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
-    IRegister r = this.memory.getRegisterFromNumber(iField.rs());
-
-    // Obtendo endereço base e offset
-    long baseAddress = Integer.toUnsignedLong(r.read());
-    int offset = iField.immediate();
-
-    // Calculando novo endereço
-    long address = baseAddress + offset;
-
-    // Obtendo localização de memória com 4 bytes
-    IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(address);
-
-    // Escrevendo valor armazenado nessa posição ao registrador
-    dest.write((int) l.read());
-  }
-
-  private void runBEQ() {
-    // Lendo campos como sendo de uma instrução tipo I
-    IField iField = this.lastInstruction.fields().asIField();
-
-    // Obtendo registradores envolvidos na operação
-    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
-    IRegister rt = this.memory.getRegisterFromNumber(iField.rt());
-
-    long offset = 4L;
-
-    // Caso os registradores possuam mesmo valor, podemo entrar
-    // na branch desejada.
-    if (rs.read() == rt.read()) {
-      offset += iField.immediate() * 4L;
-    }
-
-    // Obter localização atual do programa
-    long address = Integer.toUnsignedLong(this.memory.getPC().read());
-
-    // Atualizar nova localização
-    address += offset;
-
-    // Atualizar PC para nova localização
-    this.memory.getPC().write((int) address);
-  }
-
-  private void runBNE() {
-    // Lendo campos como sendo de uma instrução tipo I
-    IField iField = this.lastInstruction.fields().asIField();
-
-    // Obtendo registradores envolvidos na operação
-    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
-    IRegister rt = this.memory.getRegisterFromNumber(iField.rt());
-
-    long offset = 4L;
-
-    // Caso os registradores NÃO possuam mesmo valor, podemo entrar
-    // na branch desejada.
-    if (rs.read() != rt.read()) {
-      offset += iField.immediate() * 4L;
-    }
-
-    // Obter localização atual do programa
-    long address = Integer.toUnsignedLong(this.memory.getPC().read());
-
-    // Atualizar nova localização
-    address += offset;
-
-    // Atualizar PC para nova localização
-    this.memory.getPC().write((int) address);
-  }
-
-  private void runDIVU() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
-    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
-
-    // Lendo valores dos registradores
-    int v1 = rs.read();
-    int v2 = rt.read();
-
-    // Convertendo valores para versões sem sinal
-    long uV1 = Integer.toUnsignedLong(v1);
-    long uV2 = Integer.toUnsignedLong(v2);
-
-    // Calculando quociente e resto
-    long quotient = uV1 / uV2;
-    long remainder = uV1 % uV2;
-
-    // Escrevendo na memória
-    this.memory.getLO().write((int) quotient);
-    this.memory.getHI().write((int) remainder);
-  }
-
-  private void runSUBU() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
-    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
-    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
-
-    // Lendo valores dos registradores
-    int v1 = rs.read();
-    int v2 = rt.read();
-
-    // Convertendo valores para versões sem sinal
-    long uV1 = Integer.toUnsignedLong(v1);
-    long uV2 = Integer.toUnsignedLong(v2);
-
-    // Calculando resultado
-    long result = uV1 - uV2;
-
-    // Escrevendo na memória
-    dest.write((int) result);
-  }
-
-  private void runMULTU() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
-    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
-
-    // Lendo valores dos registradores
-    int v1 = rs.read();
-    int v2 = rt.read();
-
-    // Convertendo valores para versões sem sinal
-    long uV1 = Integer.toUnsignedLong(v1);
-    long uV2 = Integer.toUnsignedLong(v2);
-
-    // Calculando resultado
-    long result = uV1 * uV2;
-
-    // Escrevendo na memória
-    this.memory.getLO().write((int) result);
-    this.memory.getHI().write((int) (result >> 32));
-  }
-
-  private void runSLLV() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
-    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
-    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
-
-    // Lendo valores dos registradores
-    int v1 = rt.read();
-    int v2 = rs.read();
-
-    // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
-
-
-    // Calculando resultado
-    int result = v1 << v2;
-
-    // Escrevendo na memória
-    dest.write(result);
-  }
-
-  private void runSRLV() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
-    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
-    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
-
-    // Lendo valores dos registradores
-    int v1 = rt.read();
-    int v2 = rs.read();
-
-    // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
-
-
-    // Calculando resultado
-    int result = v1 >>> v2;
-
-    // Escrevendo na memória
-    dest.write(result);
-  }
-
-  private void runSRAV() {
-    // Lendo campos como sendo de uma instrução tipo R
-    RField rField = this.lastInstruction.fields().asRField();
-
-    // Adquirindo registradores envolvidos na operação
-    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
-    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
-    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
-
-    // Lendo valores dos registradores
-    int v1 = rt.read();
-    int v2 = rs.read();
-
-    // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
-
-
-    // Calculando resultado
-    int result = v1 >> v2;
-
-    // Escrevendo na memória
-    dest.write(result);
-  }
 }
