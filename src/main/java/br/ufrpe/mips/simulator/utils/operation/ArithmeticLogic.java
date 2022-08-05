@@ -184,5 +184,19 @@ public class ArithmeticLogic {
     // Escrevendo na memória
     dest.write(result);
   }
+  public void DIV(AssemblyInstruction instruction, StringBuffer buffer) {
 
+    RField rField = instruction.fields().asRField();
+    IRegister r1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister r2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    int v1 = r1.read();
+    int v2 = r2.read();
+
+    long c1 = v1 / v2;
+    long re1 = v1 % v2;
+
+    this.memory.getLO().write((int) c1);
+    this.memory.getHI().write((int) re1);
+  }
 }
