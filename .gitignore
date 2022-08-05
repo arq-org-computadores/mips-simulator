@@ -1,5 +1,6 @@
-# Intellij Directories
+# Intellij
 .idea/
+*.iml
 
 # VSCode
 .vscode/
