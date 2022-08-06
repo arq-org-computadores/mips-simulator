@@ -223,6 +223,7 @@ public class MIPS32Processor implements IMIPS32 {
       case DIV -> this.al.DIV(i, buffer);
       case MULTU -> this.al.MULTU(i, buffer);
       case SLL -> this.al.SLL(i, buffer);
+      case SLT -> this.al.SLT(i, buffer);
       case SLLV -> this.al.SLLV(i, buffer);
       case SRLV -> this.al.SRLV(i, buffer);
       case SRAV -> this.al.SRAV(i, buffer);
@@ -239,7 +240,7 @@ public class MIPS32Processor implements IMIPS32 {
       case LB -> this.ls.LB(i, buffer);
       case SB -> this.ls.SB(i, buffer);
       case SYSCALL -> this.sc.SYSCALL(i, buffer);
-      default -> System.out.println("Instrução não implementada");
+      default -> System.out.println("\"%s\" não implementada".formatted(i.instruction().name()));
     }
 
     // Obter saídas escritas no Buffer
