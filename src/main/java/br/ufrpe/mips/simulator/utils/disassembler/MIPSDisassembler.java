@@ -140,6 +140,7 @@ public final class MIPSDisassembler {
       case SLLV -> "sllv $%d, $%d, $%d".formatted(r.rd(), r.rt(), r.rs());
       case SRLV -> "srlv $%d, $%d, $%d".formatted(r.rd(), r.rt(), r.rs());
       case SRAV -> "srav $%d, $%d, $%d".formatted(r.rd(), r.rt(), r.rs());
+      case ORI -> "ori $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
       case SYSCALL -> "syscall";
       default -> "";
     };
