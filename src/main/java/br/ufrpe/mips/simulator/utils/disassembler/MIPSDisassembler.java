@@ -144,6 +144,7 @@ public final class MIPSDisassembler {
       case XORI -> "xori $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
       case SLL -> "sll $%d, $%d, %d".formatted(r.rd(), r.rt(), r.shamt());
       case SLT -> "slt $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
+      case SRL -> "srl $%d, $%d, %d".formatted(r.rd(), r.rt(), r.shamt());
       case SYSCALL -> "syscall";
       default -> "";
     };
