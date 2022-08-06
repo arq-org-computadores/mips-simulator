@@ -145,6 +145,25 @@ public class ArithmeticLogic {
     dest.write(result);
   }
 
+  public void SLL(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = instruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
+
+    // Lendo valores dos registradores
+    int v = rt.read();
+    int immediate = rField.shamt();
+
+    // Calculando resultado
+    int result = v << immediate;
+
+    // Escrevendo na memória
+    dest.write(result);
+  }
+
   public void SRLV(AssemblyInstruction instruction, StringBuffer buffer) {
     // Lendo campos como sendo de uma instrução tipo R
     RField rField = instruction.fields().asRField();
