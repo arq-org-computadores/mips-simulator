@@ -1,5 +1,6 @@
 package br.ufrpe.mips.simulator.utils.operation;
 
+import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.IMemoryManager;
 import br.ufrpe.mips.data.IRegister;
 import br.ufrpe.mips.simulator.utils.disassembler.MIPSDisassembler.AssemblyInstruction;
@@ -32,11 +33,32 @@ public class Syscall {
   }
 
   private void printInteger() {
-
+    int a0 = this.memory.getRegisterFromNumber(RegisterMapper.regNumberFromLabel("a0")).read();
+    System.out.println(a0);
   }
 
   private void printString() {
+    StringBuffer buffer = new StringBuffer();
 
+    int a0 = this.memory.getRegisterFromNumber(RegisterMapper.regNumberFromLabel("a0")).read();
+    long addr = Integer.toUnsignedLong(a0);
+
+    while (true) {
+      IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(addr);
+      byte value = l.read();
+
+      if (value == 0) {
+        // Terminamos de ler a string
+        break;
+      }
+
+      buffer.append((char) value);
+
+      // Buscar próximo caractere
+      addr += 1;
+    }
+
+    System.out.println(buffer);
   }
 
 
