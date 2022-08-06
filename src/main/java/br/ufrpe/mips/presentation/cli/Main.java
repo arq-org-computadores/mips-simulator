@@ -53,7 +53,7 @@ public final class Main {
    */
   private static void run(Path p) {
     if (!Files.exists(p) || Files.isDirectory(p) || !p.toString().contains(".json")) {
-      // Puar para o próximo arquivo caso não seja um json;
+      // Pular para o próximo arquivo caso não seja um json;
       return;
     }
 
