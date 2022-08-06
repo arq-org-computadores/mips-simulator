@@ -74,4 +74,17 @@ public class ImmediateAL {
     dest.write(v ^ immediate);
   }
 
+  public void SLTI(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = instruction.fields().asIField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
+    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
+
+    // Salvando resultado
+    int immediate = iField.immediate();
+    dest.write(rs.read() < immediate ? 1 : 0);
+  }
+
 }
