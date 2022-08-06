@@ -60,8 +60,14 @@ public class ArithmeticLogic {
     long uV2 = Integer.toUnsignedLong(v2);
 
     // Calculando quociente e resto
-    long quotient = uV1 / uV2;
-    long remainder = uV1 % uV2;
+    long quotient = 0; // Inicialmente, 0
+    long remainder = 0; // Inicialmente, 0
+
+    // Caso o divisor seja diferente de 0, podemos calcular
+    if (uV2 != 0) {
+      quotient = uV1 / uV2;
+      remainder = uV1 % uV2;
+    }
 
     // Escrevendo na memória
     this.memory.getLO().write((int) quotient);
