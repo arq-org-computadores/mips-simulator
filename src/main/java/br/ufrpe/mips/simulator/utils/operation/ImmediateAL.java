@@ -58,4 +58,20 @@ public class ImmediateAL {
     dest.write(v | immediate);
   }
 
+  public void XORI(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = instruction.fields().asIField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
+    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
+
+    // Obtendo valores
+    int v = rs.read();
+    int immediate = iField.immediate();
+
+    // Armazenar resultado (bitwise XOR)
+    dest.write(v ^ immediate);
+  }
+
 }
