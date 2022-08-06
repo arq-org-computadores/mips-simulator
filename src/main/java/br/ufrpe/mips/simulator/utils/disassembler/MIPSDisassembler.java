@@ -145,7 +145,7 @@ public final class MIPSDisassembler {
       case SLL -> "sll $%d, $%d, %d".formatted(r.rd(), r.rt(), r.shamt());
       case SLT -> "slt $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case SRL -> "srl $%d, $%d, %d".formatted(r.rd(), r.rt(), r.shamt());
-      case SLTI -> "slti ";
+      case SLTI -> "slti $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
       case SYSCALL -> "syscall";
       default -> "";
     };
