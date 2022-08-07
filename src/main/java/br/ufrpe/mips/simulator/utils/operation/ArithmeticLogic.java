@@ -136,7 +136,7 @@ public class ArithmeticLogic {
     int v2 = rs.read();
 
     // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
+    v2 = v2 & 0b11111;
 
     // Calculando resultado
     int result = v1 << v2;
@@ -229,7 +229,7 @@ public class ArithmeticLogic {
     int v2 = rs.read();
 
     // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
+    v2 = v2 & 0b11111;
 
     // Calculando resultado
     int result = v1 >>> v2;
@@ -252,7 +252,7 @@ public class ArithmeticLogic {
     int v2 = rs.read();
 
     // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
+    v2 = v2 & 0b11111;
 
     // Calculando resultado
     int result = v1 >> v2;
