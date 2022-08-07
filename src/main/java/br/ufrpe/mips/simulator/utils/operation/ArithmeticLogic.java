@@ -199,4 +199,19 @@ public class ArithmeticLogic {
     this.memory.getLO().write((int) c1);
     this.memory.getHI().write((int) re1);
   }
+
+  public void MULT(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+    IRegister r1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister r2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    int v1 = r1.read();
+    int v2 = r2.read();
+
+    int c1 = v1 * v2;
+
+    this.memory.getLO().write(c1);
+    this.memory.getHI().write(c1 >> 32);
+  }
 }
