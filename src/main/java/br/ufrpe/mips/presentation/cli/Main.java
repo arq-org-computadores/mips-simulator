@@ -66,6 +66,8 @@ public final class Main {
       return;
     }
 
+    System.out.println("\n--- Executando %s ---".formatted(p));
+
     // --- CARREGAMENTO DE DADOS NO SIMULADOR ---
     Main.simulator.reset(); // Limpar a memória do simulador
     Main.loadData(input);

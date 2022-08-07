@@ -43,45 +43,53 @@ public class Syscall {
 
     int a0 = this.memory.getRegisterFromNumber(RegisterMapper.regNumberFromLabel("a0")).read();
     long addr = Integer.toUnsignedLong(a0);
+    boolean done = false;
 
-    while (true) {
-      IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(addr);
-      byte value = l.read();
+    while (!done) {
+      StringBuffer inner = new StringBuffer();
 
-      if (value == 0) {
-        // Terminamos de ler a string
-        break;
+      for (int i = 3; i >= 0; i--) {
+        IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(addr + i);
+        byte value = l.read();
+        char ch = (char) value;
+
+        if (ch == '\0') {
+          // Terminamos de ler a string
+          done = true;
+          break;
+        }
+
+        inner.append(ch);
       }
 
-      buffer.append((char) value);
+      // Adicionando ao buffer
+      buffer.append(inner);
 
-      // Buscar próximo caractere
-      addr += 1;
+      // Ir para próxima palavra MIPS
+      addr += 4;
     }
 
-    System.out.println(buffer);
+    System.out.print(buffer);
   }
 
 
   private void readInteger() {
     // try with resource
     // Abre e fechar o scanner após execução do código
-    try (Scanner scanner = new Scanner(System.in)) {
-      // Leitura do inteiro
-      int i = scanner.nextInt();
+    Scanner scanner = new Scanner(System.in);
+    // Leitura do inteiro
+    int i = Integer.parseInt(scanner.nextLine());
 
-      // Escrita no registrador
-      int regNumber = RegisterMapper.regNumberFromLabel("v0");
-      IRegister dest = this.memory.getRegisterFromNumber(regNumber);
-      dest.write(i);
-    }
+    // Escrita no registrador
+    int regNumber = RegisterMapper.regNumberFromLabel("v0");
+    IRegister dest = this.memory.getRegisterFromNumber(regNumber);
+    dest.write(i);
   }
 
   private void readString() {
     // Leitura da String
     Scanner scanner = new Scanner(System.in);
     String line = scanner.nextLine();
-    scanner.close();
 
     // Leitura dos parâmetros
     int regNumber = RegisterMapper.regNumberFromLabel("a0");
@@ -102,12 +110,18 @@ public class Syscall {
       return;
     }
 
-    for (char ch : line.toCharArray()) {
-      this.memory.getByteMemoryLocationFromAddress(baseAddr + offset).write((byte) ch);
-      offset += 1;
-    }
-
     this.memory.getByteMemoryLocationFromAddress(baseAddr + offset).write((byte) '\0');
+    offset += 1;
+
+    for (int i = 0; i < line.length(); i += 4) {
+      int end = Math.min(i + 4, line.length());
+      String sub = new StringBuffer(line.substring(i, end)).reverse().toString();
+
+      for (char ch : sub.toCharArray()) {
+        this.memory.getByteMemoryLocationFromAddress(baseAddr + offset).write((byte) ch);
+        offset += 1;
+      }
+    }
   }
 
 }
