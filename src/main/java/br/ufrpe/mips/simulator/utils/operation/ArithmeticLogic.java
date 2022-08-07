@@ -276,4 +276,20 @@ public class ArithmeticLogic {
     this.memory.getLO().write((int) c1);
     this.memory.getHI().write((int) re1);
   }
+
+  public void MULT(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+    IRegister r1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister r2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    int v1 = r1.read();
+    int v2 = r2.read();
+
+
+    long c1 = v1 * v2;
+
+    this.memory.getLO().write((int)(c1 & 4294967295L));
+    this.memory.getHI().write((int)(c1 & -4294967296L));
+  }
 }

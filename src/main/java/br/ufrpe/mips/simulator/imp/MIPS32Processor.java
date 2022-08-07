@@ -221,6 +221,7 @@ public class MIPS32Processor implements IMIPS32 {
       case DIVU -> this.al.DIVU(i, buffer);
       case SUBU -> this.al.SUBU(i, buffer);
       case DIV -> this.al.DIV(i, buffer);
+      case MULT -> this.al.MULT(i, buffer);
       case MULTU -> this.al.MULTU(i, buffer);
       case SLL -> this.al.SLL(i, buffer);
       case SLT -> this.al.SLT(i, buffer);
