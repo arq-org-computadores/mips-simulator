@@ -209,9 +209,10 @@ public class ArithmeticLogic {
     int v1 = r1.read();
     int v2 = r2.read();
 
-    int c1 = v1 * v2;
 
-    this.memory.getLO().write(c1);
-    this.memory.getHI().write(c1 >> 32);
+    long c1 = v1 * v2;
+
+    this.memory.getLO().write((int)(c1 & 4294967295L));
+    this.memory.getHI().write((int)(c1 & -4294967296L));
   }
 }
