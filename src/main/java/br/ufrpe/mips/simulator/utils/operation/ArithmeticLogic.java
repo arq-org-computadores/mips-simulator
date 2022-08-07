@@ -32,15 +32,15 @@ public class ArithmeticLogic {
     int v1 = s1.read();
     int v2 = s2.read();
 
-    // Checar por overflow
     try {
+      // Gera exceção em caso de overflow
       Math.addExact(v1, v2);
+
+      // Armazenar resultado
+      dest.write(v1 + v2);
     } catch (ArithmeticException e) {
       buffer.append("overflow");
     }
-
-    // Armazenar resultado
-    dest.write(v1 + v2);
   }
 
   public void DIVU(AssemblyInstruction instruction, StringBuffer buffer) {
@@ -260,7 +260,7 @@ public class ArithmeticLogic {
     // Escrevendo na memória
     dest.write(result);
   }
-  
+
   public void DIV(AssemblyInstruction instruction, StringBuffer buffer) {
 
     RField rField = instruction.fields().asRField();
@@ -289,7 +289,7 @@ public class ArithmeticLogic {
 
     long c1 = v1 * v2;
 
-    this.memory.getLO().write((int)(c1 & 4294967295L));
-    this.memory.getHI().write((int)(c1 & -4294967296L));
+    this.memory.getLO().write((int) (c1 & 4294967295L));
+    this.memory.getHI().write((int) (c1 & -4294967296L));
   }
 }
