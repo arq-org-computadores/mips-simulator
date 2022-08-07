@@ -1,5 +1,6 @@
 package br.ufrpe.mips.simulator.utils.operation;
 
+import java.util.Scanner;
 import br.ufrpe.mips.data.IMemoryLocation;
 import br.ufrpe.mips.data.IMemoryManager;
 import br.ufrpe.mips.data.IRegister;
@@ -63,11 +64,50 @@ public class Syscall {
 
 
   private void readInteger() {
+    // try with resource
+    // Abre e fechar o scanner após execução do código
+    try (Scanner scanner = new Scanner(System.in)) {
+      // Leitura do inteiro
+      int i = scanner.nextInt();
 
+      // Escrita no registrador
+      int regNumber = RegisterMapper.regNumberFromLabel("v0");
+      IRegister dest = this.memory.getRegisterFromNumber(regNumber);
+      dest.write(i);
+    }
   }
 
   private void readString() {
+    // Leitura da String
+    Scanner scanner = new Scanner(System.in);
+    String line = scanner.nextLine();
+    scanner.close();
 
+    // Leitura dos parâmetros
+    int regNumber = RegisterMapper.regNumberFromLabel("a0");
+    int addr = this.memory.getRegisterFromNumber(regNumber).read();
+
+    regNumber = RegisterMapper.regNumberFromLabel("a1");
+    int maxChars = this.memory.getRegisterFromNumber(regNumber).read();
+
+    long baseAddr = Integer.toUnsignedLong(addr);
+    long offset = 0L;
+
+    if (maxChars < 1 || line.length() > maxChars - 1) {
+      return;
+    }
+
+    if (maxChars == 1) {
+      this.memory.getByteMemoryLocationFromAddress(baseAddr).write((byte) '\0');
+      return;
+    }
+
+    for (char ch : line.toCharArray()) {
+      this.memory.getByteMemoryLocationFromAddress(baseAddr + offset).write((byte) ch);
+      offset += 1;
+    }
+
+    this.memory.getByteMemoryLocationFromAddress(baseAddr + offset).write((byte) '\0');
   }
 
 }
