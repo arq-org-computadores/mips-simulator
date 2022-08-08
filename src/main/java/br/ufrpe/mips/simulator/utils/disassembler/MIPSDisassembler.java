@@ -124,6 +124,7 @@ public final class MIPSDisassembler {
     return switch (instruction) {
       case DIV -> "div $%d, $%d".formatted(r.rs(), r.rt());
       case MULT -> "mult $%d, $%d".formatted(r.rs(), r.rt());
+      case MFLO -> "mflo $%d".formatted(r.rd());
       case ADD -> "add $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case SUB -> "sub $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case ADDI -> "addi $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
