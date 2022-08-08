@@ -108,4 +108,40 @@ public class LoadStore {
     dest.write((int) l.read());
   }
 
+  public void LBU(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = instruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
+    IRegister r = this.memory.getRegisterFromNumber(iField.rs());
+
+    // Obtendo endereço base e offset
+    long baseAddress = Integer.toUnsignedLong(r.read());
+    int offset = iField.immediate();
+
+    // Calculando novo endereço
+    long address = baseAddress + offset;
+
+    // Obtendo localização de memória com 4 bytes
+    IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(address);
+
+    // Escrevendo valor armazenado nessa posição ao registrador
+    dest.write((int) Byte.toUnsignedInt(l.read()));
+  }
+
+  public void LUI (AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = instruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
+
+    // Obtendo valor
+    int immediate = iField.immediate() << 16;
+
+    // Escrevendo valor armazenado nessa posição ao registrador
+    dest.write(immediate);
+  }
+
 }

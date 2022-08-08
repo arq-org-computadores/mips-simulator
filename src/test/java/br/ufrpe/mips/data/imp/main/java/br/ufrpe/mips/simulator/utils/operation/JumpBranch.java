@@ -66,7 +66,7 @@ public class JumpBranch {
 
     long offset = 4L;
 
-    // Caso os registradores possuam mesmo valor, podemo entrar
+    // Caso os registradores possuam mesmo valor, podemos entrar
     // na branch desejada.
     if (rs.read() == rt.read()) {
       offset += iField.immediate() * 4L;
@@ -92,9 +92,84 @@ public class JumpBranch {
 
     long offset = 4L;
 
-    // Caso os registradores NÃO possuam mesmo valor, podemo entrar
+    // Caso os registradores NÃO possuam mesmo valor, podemos entrar
     // na branch desejada.
     if (rs.read() != rt.read()) {
+      offset += iField.immediate() * 4L;
+    }
+
+    // Obter localização atual do programa
+    long address = Integer.toUnsignedLong(this.memory.getPC().read());
+
+    // Atualizar nova localização
+    address += offset;
+
+    // Atualizar PC para nova localização
+    this.memory.getPC().write((int) address);
+  }
+
+  public void BLEZ (AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = instruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
+
+    long offset = 4L;
+
+    // Caso o registrador seja menor ou igual a 0, podemos entrar
+    // na branch desejada.
+    if (rs.read() <= 0) {
+      offset += iField.immediate() * 4L;
+    }
+
+    // Obter localização atual do programa
+    long address = Integer.toUnsignedLong(this.memory.getPC().read());
+
+    // Atualizar nova localização
+    address += offset;
+
+    // Atualizar PC para nova localização
+    this.memory.getPC().write((int) address);
+  }
+
+  public void BLTZ (AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = instruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
+
+    long offset = 4L;
+
+    // Caso o registrador seja menor que 0, podemos entrar
+    // na branch desejada.
+    if (rs.read() < 0) {
+      offset += iField.immediate() * 4L;
+    }
+
+    // Obter localização atual do programa
+    long address = Integer.toUnsignedLong(this.memory.getPC().read());
+
+    // Atualizar nova localização
+    address += offset;
+
+    // Atualizar PC para nova localização
+    this.memory.getPC().write((int) address);
+  }
+
+  public void BGTZ (AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo I
+    IField iField = instruction.fields().asIField();
+
+    // Obtendo registradores envolvidos na operação
+    IRegister rs = this.memory.getRegisterFromNumber(iField.rs());
+
+    long offset = 4L;
+
+    // Caso o registrador seja maior que 0, podemos entrar
+    // na branch desejada.
+    if (rs.read() > 0) {
       offset += iField.immediate() * 4L;
     }
 
