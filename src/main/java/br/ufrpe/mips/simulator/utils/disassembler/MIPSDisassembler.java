@@ -154,6 +154,7 @@ public final class MIPSDisassembler {
       case SRA -> "sra $%d, $%d, %d".formatted(r.rd(), r.rt(), r.shamt());
       case XOR -> "xor $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case NOR -> "nor $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
+      case AND -> "and $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case SYSCALL -> "syscall";
       default -> "";
     };
