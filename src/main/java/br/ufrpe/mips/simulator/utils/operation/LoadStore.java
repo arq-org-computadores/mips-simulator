@@ -127,7 +127,7 @@ public class LoadStore {
     IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(address);
 
     // Escrevendo valor armazenado nessa posição ao registrador
-    dest.write((int) Byte.toUnsignedInt(l.read()));
+    dest.write(Byte.toUnsignedInt(l.read()));
   }
 
   public void LUI (AssemblyInstruction instruction, StringBuffer buffer) {
