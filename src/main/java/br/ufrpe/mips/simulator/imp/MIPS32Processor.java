@@ -235,6 +235,7 @@ public class MIPS32Processor implements IMIPS32 {
       case SRLV -> this.al.SRLV(i, buffer);
       case SRAV -> this.al.SRAV(i, buffer);
       case XOR -> this.al.XOR(i, buffer);
+      case NOR -> this.al.NOR(i, buffer);
       case ADDI -> this.ial.ADDI(i, buffer);
       case ORI -> this.ial.ORI(i, buffer);
       case XORI -> this.ial.XORI(i, buffer);
