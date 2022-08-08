@@ -306,9 +306,15 @@ public class ArithmeticLogic {
     int v1 = r1.read();
     int v2 = r2.read();
 
-    int result = v1 - v2;
+    try {
+      // Gera exceção em caso de overflow
+      Math.subtractExact(v1, v2);
 
-    d.write(result);
+      // Armazenar resultado
+      d.write(v1 - v2);
+    } catch (ArithmeticException e) {
+      buffer.append("overflow");
+    }
   }
 
   public void MFLO(AssemblyInstruction instruction, StringBuffer buffer) {
