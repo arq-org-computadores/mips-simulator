@@ -119,7 +119,7 @@ public class ArithmeticLogic {
 
     // Escrevendo na memória
     this.memory.getLO().write((int) result);
-    this.memory.getHI().write((int) (result >> 32));
+    this.memory.getHI().write((int) (result >>> 32));
   }
 
   public void SLLV(AssemblyInstruction instruction, StringBuffer buffer) {
@@ -287,11 +287,14 @@ public class ArithmeticLogic {
     int v2 = r2.read();
 
 
-    long c1 = v1 * v2;
+    long uV1 = v1;
+    long uV2 = v2;
+    long c1 = uV1 * uV2;
 
-    this.memory.getLO().write((int) (c1 & 4294967295L));
-    this.memory.getHI().write((int) (c1 & -4294967296L));
+    this.memory.getLO().write((int) c1);
+    this.memory.getHI().write((int) (c1 >>> 32));
   }
+
   public void SUB(AssemblyInstruction instruction, StringBuffer buffer) {
 
     RField rField = instruction.fields().asRField();
