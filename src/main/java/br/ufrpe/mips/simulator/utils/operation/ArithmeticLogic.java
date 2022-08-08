@@ -292,4 +292,19 @@ public class ArithmeticLogic {
     this.memory.getLO().write((int) (c1 & 4294967295L));
     this.memory.getHI().write((int) (c1 & -4294967296L));
   }
+  public void SUB(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+
+    IRegister d = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister r1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister r2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    int v1 = r1.read();
+    int v2 = r2.read();
+
+    int result = v1 - v2;
+
+    d.write(result);
+  }
 }
