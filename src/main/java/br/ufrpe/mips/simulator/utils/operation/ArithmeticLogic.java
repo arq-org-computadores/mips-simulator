@@ -325,9 +325,9 @@ public class ArithmeticLogic {
 
     IRegister d = this.memory.getRegisterFromNumber(rField.rd());
 
-    long v1 = this.memory.getHI().read();
+    int v1 = this.memory.getHI().read();
 
-    d.write((int) v1);
+    d.write(v1);
   }
 }
 
