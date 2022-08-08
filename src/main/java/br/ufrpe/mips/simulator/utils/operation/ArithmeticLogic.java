@@ -321,5 +321,16 @@ public class ArithmeticLogic {
 
     d.write((int) v1);
   }
+
+  public void MFHI(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+
+    IRegister d = this.memory.getRegisterFromNumber(rField.rd());
+
+    int v1 = this.memory.getHI().read();
+
+    d.write(v1);
+  }
 }
 
