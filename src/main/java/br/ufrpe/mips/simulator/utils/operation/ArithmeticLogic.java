@@ -43,6 +43,27 @@ public class ArithmeticLogic {
     }
   }
 
+  public void ADDU(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = instruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister s1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister s2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    // Lendo valores dos registradores
+    int v1 = s1.read();
+    int v2 = s2.read();
+
+    // Convertendo para suas versões sem sinal
+    long uV1 = Integer.toUnsignedLong(v1);
+    long uV2 = Integer.toUnsignedLong(v2);
+
+    // Salvando resultado no registrador
+    dest.write((int) (uV1 + uV2));
+  }
+
   public void DIVU(AssemblyInstruction instruction, StringBuffer buffer) {
     // Lendo campos como sendo de uma instrução tipo R
     RField rField = instruction.fields().asRField();
