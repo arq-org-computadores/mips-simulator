@@ -31,15 +31,15 @@ public class ImmediateAL {
     int v1 = r1.read();
     int immediate = iField.immediate();
 
-    // Checar por overflow
     try {
+      // Gera exceção em caso de overflow
       Math.addExact(v1, immediate);
+
+      // Armazenar resultado
+      dest.write(v1 + immediate);
     } catch (ArithmeticException e) {
       buffer.append("overflow");
     }
-
-    // Armazenar resultado
-    dest.write(v1 + immediate);
   }
 
   public void ORI(AssemblyInstruction instruction, StringBuffer buffer) {

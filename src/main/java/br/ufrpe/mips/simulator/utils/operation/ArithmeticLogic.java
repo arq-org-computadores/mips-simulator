@@ -32,15 +32,36 @@ public class ArithmeticLogic {
     int v1 = s1.read();
     int v2 = s2.read();
 
-    // Checar por overflow
     try {
+      // Gera exceção em caso de overflow
       Math.addExact(v1, v2);
+
+      // Armazenar resultado
+      dest.write(v1 + v2);
     } catch (ArithmeticException e) {
       buffer.append("overflow");
     }
+  }
 
-    // Armazenar resultado
-    dest.write(v1 + v2);
+  public void ADDU(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = instruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister s1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister s2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    // Lendo valores dos registradores
+    int v1 = s1.read();
+    int v2 = s2.read();
+
+    // Convertendo para suas versões sem sinal
+    long uV1 = Integer.toUnsignedLong(v1);
+    long uV2 = Integer.toUnsignedLong(v2);
+
+    // Salvando resultado no registrador
+    dest.write((int) (uV1 + uV2));
   }
 
   public void DIVU(AssemblyInstruction instruction, StringBuffer buffer) {
@@ -119,7 +140,7 @@ public class ArithmeticLogic {
 
     // Escrevendo na memória
     this.memory.getLO().write((int) result);
-    this.memory.getHI().write((int) (result >> 32));
+    this.memory.getHI().write((int) (result >>> 32));
   }
 
   public void SLLV(AssemblyInstruction instruction, StringBuffer buffer) {
@@ -136,7 +157,7 @@ public class ArithmeticLogic {
     int v2 = rs.read();
 
     // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
+    v2 = v2 & 0b11111;
 
     // Calculando resultado
     int result = v1 << v2;
@@ -229,7 +250,7 @@ public class ArithmeticLogic {
     int v2 = rs.read();
 
     // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
+    v2 = v2 & 0b11111;
 
     // Calculando resultado
     int result = v1 >>> v2;
@@ -252,7 +273,7 @@ public class ArithmeticLogic {
     int v2 = rs.read();
 
     // Considerando apenas os últimos 5 bits de rs
-    v2 = (v2 << 27) >> 27;
+    v2 = v2 & 0b11111;
 
     // Calculando resultado
     int result = v1 >> v2;
@@ -260,7 +281,7 @@ public class ArithmeticLogic {
     // Escrevendo na memória
     dest.write(result);
   }
-  
+
   public void DIV(AssemblyInstruction instruction, StringBuffer buffer) {
 
     RField rField = instruction.fields().asRField();
@@ -276,4 +297,101 @@ public class ArithmeticLogic {
     this.memory.getLO().write((int) c1);
     this.memory.getHI().write((int) re1);
   }
+
+  public void MULT(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+    IRegister r1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister r2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    int v1 = r1.read();
+    int v2 = r2.read();
+
+
+    long uV1 = v1;
+    long uV2 = v2;
+    long c1 = uV1 * uV2;
+
+    this.memory.getLO().write((int) c1);
+    this.memory.getHI().write((int) (c1 >>> 32));
+  }
+
+  public void SUB(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+
+    IRegister d = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister r1 = this.memory.getRegisterFromNumber(rField.rs());
+    IRegister r2 = this.memory.getRegisterFromNumber(rField.rt());
+
+    int v1 = r1.read();
+    int v2 = r2.read();
+
+    try {
+      // Gera exceção em caso de overflow
+      Math.subtractExact(v1, v2);
+
+      // Armazenar resultado
+      d.write(v1 - v2);
+    } catch (ArithmeticException e) {
+      buffer.append("overflow");
+    }
+  }
+
+  public void MFLO(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+
+    IRegister d = this.memory.getRegisterFromNumber(rField.rd());
+
+    int v1 = this.memory.getLO().read();
+
+    d.write(v1);
+  }
+
+  public void MFHI(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+
+    IRegister d = this.memory.getRegisterFromNumber(rField.rd());
+
+    int v1 = this.memory.getHI().read();
+
+    d.write(v1);
+  }
+
+  public void XOR(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = instruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
+    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
+
+    // Lendo valores dos registradores
+    int v1 = rt.read();
+    int v2 = rs.read();
+
+    // Escrevendo na memória
+    dest.write(v1 ^ v2);
+  }
+
+  public void NOR(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = instruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
+    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
+
+    // Lendo valores dos registradores
+    int v1 = rt.read();
+    int v2 = rs.read();
+
+    // Escrevendo na memória (NOR é o mesmo que negar um OR)
+    dest.write(~(v1 | v2));
+  }
 }
+

@@ -182,7 +182,7 @@ public class MIPS32Processor implements IMIPS32 {
       IMemoryLocation<Integer> l =
           this.memory.getWordMemoryLocationFromAddress(this.finalInstrAddr);
 
-      // Removendo prefixo 0x caso
+      // Removendo prefixo 0x caso exista
       if (hex.contains("0x")) {
         hex = hex.substring(2);
       }
@@ -208,7 +208,8 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Obter instrução atual
     int instruction = this.memory.getWordMemoryLocationFromAddress(address).read();
-    this.hex = "0x%s".formatted(Integer.toHexString(instruction));
+    String hexString = Integer.toHexString(instruction);
+    this.hex = "0x%s".formatted("0".repeat(8 - hexString.length()) + hexString);
     this.lastInstruction = MIPSDisassembler.toAssembly(this.hex);
     AssemblyInstruction i = this.lastInstruction;
 
@@ -218,10 +219,15 @@ public class MIPS32Processor implements IMIPS32 {
     // Escolha da instrução
     switch (i.instruction()) {
       case ADD -> this.al.ADD(i, buffer);
+      case ADDU -> this.al.ADDU(i, buffer);
+      case SUB -> this.al.SUB(i, buffer);
       case DIVU -> this.al.DIVU(i, buffer);
       case SUBU -> this.al.SUBU(i, buffer);
       case DIV -> this.al.DIV(i, buffer);
+      case MULT -> this.al.MULT(i, buffer);
       case MULTU -> this.al.MULTU(i, buffer);
+      case MFLO -> this.al.MFLO(i, buffer);
+      case MFHI -> this.al.MFHI(i, buffer);
       case SLL -> this.al.SLL(i, buffer);
       case SLT -> this.al.SLT(i, buffer);
       case SRL -> this.al.SRL(i, buffer);
@@ -229,6 +235,8 @@ public class MIPS32Processor implements IMIPS32 {
       case SLLV -> this.al.SLLV(i, buffer);
       case SRLV -> this.al.SRLV(i, buffer);
       case SRAV -> this.al.SRAV(i, buffer);
+      case XOR -> this.al.XOR(i, buffer);
+      case NOR -> this.al.NOR(i, buffer);
       case ADDI -> this.ial.ADDI(i, buffer);
       case ORI -> this.ial.ORI(i, buffer);
       case XORI -> this.ial.XORI(i, buffer);
