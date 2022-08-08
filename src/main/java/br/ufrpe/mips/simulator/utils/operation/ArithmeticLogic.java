@@ -344,9 +344,9 @@ public class ArithmeticLogic {
 
     IRegister d = this.memory.getRegisterFromNumber(rField.rd());
 
-    long v1 = this.memory.getLO().read();
+    int v1 = this.memory.getLO().read();
 
-    d.write((int) v1);
+    d.write(v1);
   }
 
   public void MFHI(AssemblyInstruction instruction, StringBuffer buffer) {
@@ -358,6 +358,23 @@ public class ArithmeticLogic {
     int v1 = this.memory.getHI().read();
 
     d.write(v1);
+  }
+
+  public void XOR(AssemblyInstruction instruction, StringBuffer buffer) {
+    // Lendo campos como sendo de uma instrução tipo R
+    RField rField = instruction.fields().asRField();
+
+    // Adquirindo registradores envolvidos na operação
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
+    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
+
+    // Lendo valores dos registradores
+    int v1 = rt.read();
+    int v2 = rs.read();
+
+    // Escrevendo na memória
+    dest.write(v1 ^ v2);
   }
 }
 
