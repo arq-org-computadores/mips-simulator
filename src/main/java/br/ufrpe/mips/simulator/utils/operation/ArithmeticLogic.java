@@ -307,4 +307,16 @@ public class ArithmeticLogic {
 
     d.write(result);
   }
+
+  public void MFLO(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+
+    IRegister d = this.memory.getRegisterFromNumber(rField.rd());
+
+    long v1 = this.memory.getLO().read();
+
+    d.write((int) v1);
+  }
 }
+
