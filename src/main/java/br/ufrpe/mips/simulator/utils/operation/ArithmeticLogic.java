@@ -344,9 +344,9 @@ public class ArithmeticLogic {
 
     IRegister d = this.memory.getRegisterFromNumber(rField.rd());
 
-    long v1 = this.memory.getLO().read();
+    int v1 = this.memory.getLO().read();
 
-    d.write((int) v1);
+    d.write(v1);
   }
 
   public void MFHI(AssemblyInstruction instruction, StringBuffer buffer) {
