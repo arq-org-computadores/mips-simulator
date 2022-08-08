@@ -182,7 +182,7 @@ public class MIPS32Processor implements IMIPS32 {
       IMemoryLocation<Integer> l =
           this.memory.getWordMemoryLocationFromAddress(this.finalInstrAddr);
 
-      // Removendo prefixo 0x caso
+      // Removendo prefixo 0x caso exista
       if (hex.contains("0x")) {
         hex = hex.substring(2);
       }
@@ -208,7 +208,8 @@ public class MIPS32Processor implements IMIPS32 {
 
     // Obter instrução atual
     int instruction = this.memory.getWordMemoryLocationFromAddress(address).read();
-    this.hex = "0x%s".formatted(Integer.toHexString(instruction));
+    String hexString = Integer.toHexString(instruction);
+    this.hex = "0x%s".formatted("0".repeat(8 - hexString.length()) + hexString);
     this.lastInstruction = MIPSDisassembler.toAssembly(this.hex);
     AssemblyInstruction i = this.lastInstruction;
 
