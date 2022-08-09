@@ -241,6 +241,7 @@ public class MIPS32Processor implements IMIPS32 {
       case NOR -> this.al.NOR(i, buffer);
       case AND -> this.al.AND(i, buffer);
       case ADDI -> this.ial.ADDI(i, buffer);
+      case ADDIU -> this.ial.ADDIU(i, buffer);
       case ORI -> this.ial.ORI(i, buffer);
       case XORI -> this.ial.XORI(i, buffer);
       case SLTI -> this.ial.SLTI(i, buffer);

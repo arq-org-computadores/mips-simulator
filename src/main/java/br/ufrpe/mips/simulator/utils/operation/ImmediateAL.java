@@ -99,5 +99,26 @@ public class ImmediateAL {
 
     dest.write((v1 & immediate));
   }
+  public void ADDIU(AssemblyInstruction instruction, StringBuffer buffer) {
 
+    IField iField = instruction.fields().asIField();
+
+
+    IRegister dest = this.memory.getRegisterFromNumber(iField.rt());
+    IRegister r1 = this.memory.getRegisterFromNumber(iField.rs());
+
+    int v1 = r1.read();
+    int immediate = iField.immediate();
+
+    long uv1 = Integer.toUnsignedLong(v1);
+    long uv2 = Integer.toUnsignedLong(immediate);
+
+    try {
+      Math.addExact(uv1, uv2);
+
+      dest.write((int)uv1 + (int)uv2);
+    } catch (ArithmeticException e) {
+      buffer.append("overflow");
+    }
+  }
 }
