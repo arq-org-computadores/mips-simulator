@@ -248,9 +248,14 @@ public class MIPS32Processor implements IMIPS32 {
       case JAL -> this.jb.JAL(i, buffer);
       case BEQ -> this.jb.BEQ(i, buffer);
       case BNE -> this.jb.BNE(i, buffer);
+      case BLEZ -> this.jb.BLEZ(i, buffer);
+      case BLTZ -> this.jb.BLTZ(i, buffer);
+      case BGTZ -> this.jb.BGTZ(i, buffer);
+      case LUI -> this.ls.LUI(i, buffer);
       case SW -> this.ls.SW(i, buffer);
       case LW -> this.ls.LW(i, buffer);
       case LB -> this.ls.LB(i, buffer);
+      case LBU -> this.ls.LBU(i, buffer);
       case SB -> this.ls.SB(i, buffer);
       case SYSCALL -> this.sc.SYSCALL(i, buffer);
       default -> System.out.println("\"%s\" não implementada".formatted(i.instruction().name()));

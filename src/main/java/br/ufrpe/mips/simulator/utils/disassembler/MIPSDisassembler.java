@@ -137,7 +137,12 @@ public final class MIPSDisassembler {
       case JAL -> "jal %d".formatted(Integer.toUnsignedLong(j.address()));
       case BEQ -> "beq $%d, $%d, %d".formatted(i.rs(), i.rt(), i.immediate());
       case BNE -> "bne $%d, $%d, %d".formatted(i.rs(), i.rt(), i.immediate());
+      case BLEZ -> "blez $%d, $%d".formatted(i.rs(), i.immediate());
+      case BLTZ -> "bltz $%d, $%d".formatted(i.rs(), i.immediate());
+      case BGTZ -> "bgtz $%d, $%d".formatted(i.rs(), i.immediate());
+      case LUI -> "lui $%d, %d".formatted(i.rt(), i.immediate());
       case LB -> "lb $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
+      case LBU -> "lbu $%d, %d($%d)".formatted(i.rt(), i.immediate(),i.rs());
       case SB -> "sb $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
       case DIVU -> "divu $%d, $%d".formatted(r.rs(), r.rt());
       case SUBU -> "subu $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
