@@ -407,6 +407,7 @@ public class ArithmeticLogic {
 
     dest.write((v1 & v2));
   }
+
   public void OR(AssemblyInstruction instruction, StringBuffer buffer) {
 
     RField rField = instruction.fields().asRField();

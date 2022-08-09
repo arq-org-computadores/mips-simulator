@@ -220,6 +220,7 @@ public class MIPS32Processor implements IMIPS32 {
     switch (i.instruction()) {
       case ADD -> this.al.ADD(i, buffer);
       case ADDU -> this.al.ADDU(i, buffer);
+      case ANDI -> this.ial.ANDI(i, buffer);
       case SUB -> this.al.SUB(i, buffer);
       case DIVU -> this.al.DIVU(i, buffer);
       case SUBU -> this.al.SUBU(i, buffer);
