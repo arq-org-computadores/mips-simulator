@@ -122,6 +122,15 @@ public class LoadStore {
 
     // Calculando novo endereço
     long address = baseAddress + offset;
+    long remainder = address % 4L;
+
+    switch ((int) remainder) {
+      case 0 -> address += 3;
+      case 1 -> address += 1;
+      case 2 -> address -= 1;
+      case 3 -> address -= 3;
+      default -> address = -1;
+    }
 
     // Obtendo localização de memória com 4 bytes
     IMemoryLocation<Byte> l = this.memory.getByteMemoryLocationFromAddress(address);
@@ -130,7 +139,7 @@ public class LoadStore {
     dest.write(Byte.toUnsignedInt(l.read()));
   }
 
-  public void LUI (AssemblyInstruction instruction, StringBuffer buffer) {
+  public void LUI(AssemblyInstruction instruction, StringBuffer buffer) {
     // Lendo campos como sendo de uma instrução tipo I
     IField iField = instruction.fields().asIField();
 
