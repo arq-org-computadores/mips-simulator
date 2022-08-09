@@ -113,12 +113,6 @@ public class ImmediateAL {
     long uv1 = Integer.toUnsignedLong(v1);
     long uv2 = Integer.toUnsignedLong(immediate);
 
-    try {
-      Math.addExact(uv1, uv2);
-
-      dest.write((int)uv1 + (int)uv2);
-    } catch (ArithmeticException e) {
-      buffer.append("overflow");
-    }
+    dest.write((int)(uv1 + uv2));
   }
 }
