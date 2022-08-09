@@ -130,6 +130,7 @@ public final class MIPSDisassembler {
       case ADDU -> "addu $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case SUB -> "sub $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case ADDI -> "addi $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
+      case ADDIU -> "addiu $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
       case ANDI -> "andi $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
       case J -> "j %d".formatted(Integer.toUnsignedLong(j.address()));
       case LW -> "lw $%d, %d($%d)".formatted(i.rt(), i.immediate(), i.rs());
