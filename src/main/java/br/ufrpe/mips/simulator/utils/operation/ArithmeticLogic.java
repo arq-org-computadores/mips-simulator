@@ -393,6 +393,7 @@ public class ArithmeticLogic {
     // Escrevendo na memória (NOR é o mesmo que negar um OR)
     dest.write(~(v1 | v2));
   }
+
   public void AND(AssemblyInstruction instruction, StringBuffer buffer) {
 
     RField rField = instruction.fields().asRField();
@@ -405,6 +406,19 @@ public class ArithmeticLogic {
     int v2 = rs.read();
 
     dest.write((v1 & v2));
+  }
+  public void OR(AssemblyInstruction instruction, StringBuffer buffer) {
+
+    RField rField = instruction.fields().asRField();
+
+    IRegister dest = this.memory.getRegisterFromNumber(rField.rd());
+    IRegister rt = this.memory.getRegisterFromNumber(rField.rt());
+    IRegister rs = this.memory.getRegisterFromNumber(rField.rs());
+
+    int v1 = rt.read();
+    int v2 = rs.read();
+
+    dest.write((v1 | v2));
   }
 }
 

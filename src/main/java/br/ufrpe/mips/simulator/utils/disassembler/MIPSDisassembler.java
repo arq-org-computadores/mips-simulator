@@ -153,6 +153,7 @@ public final class MIPSDisassembler {
       case SLTI -> "slti $%d, $%d, %d".formatted(i.rt(), i.rs(), i.immediate());
       case SRA -> "sra $%d, $%d, %d".formatted(r.rd(), r.rt(), r.shamt());
       case XOR -> "xor $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
+      case OR -> "or $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case NOR -> "nor $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case AND -> "and $%d, $%d, $%d".formatted(r.rd(), r.rs(), r.rt());
       case SYSCALL -> "syscall";
