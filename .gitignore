@@ -9,6 +9,9 @@
 out/
 target/
 
+# Python
+venv/
+
 # Outros
 input/
 output/
