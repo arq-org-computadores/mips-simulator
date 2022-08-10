@@ -13,17 +13,18 @@ import org.apache.commons.io.FileUtils;
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import br.ufrpe.mips.data.imp.MARSMemoryManager;
 import br.ufrpe.mips.presentation.entity.InputJSON;
 import br.ufrpe.mips.presentation.entity.OutputJSON;
 import br.ufrpe.mips.simulator.IMIPS32;
+import br.ufrpe.mips.simulator.imp.MIPS32Processor;
 
 public final class Main {
   private static Path inputPath = Path.of("input");
   private static Path outputPath = Path.of("output");
   private static ObjectMapper mapper = new ObjectMapper();
   private static PrettyPrinter printer = new DefaultPrettyPrinter().withoutSpacesInObjectEntries();
-  private static IMIPS32 simulator;
+  private static IMIPS32 simulator = new MIPS32Processor(new MARSMemoryManager());
 
   private Main() {
     // Essa classe não pode ser instanciada.
@@ -44,8 +45,7 @@ public final class Main {
   }
 
   /**
-   * Recebe um caminho para um arquivo JSON e executa o algoritmo representado por
-   * ele no simulador.
+   * Recebe um caminho para um arquivo JSON e executa o algoritmo representado por ele no simulador.
    * 
    * Salva o resultado da execução em um arquivo JSON de saída.
    * 
@@ -92,8 +92,7 @@ public final class Main {
   }
 
   /**
-   * Método utilitário, carrega todos os dados necessários no simulador na
-   * memória: registradores e
+   * Método utilitário, carrega todos os dados necessários no simulador na memória: registradores e
    * memória principal.
    * 
    * @param input arquivo de entrada contendo todos os dados.
@@ -113,8 +112,7 @@ public final class Main {
   }
 
   /**
-   * Método utilitário, converte o estado atual do simulador para um
-   * {@link OutputJSON}.
+   * Método utilitário, converte o estado atual do simulador para um {@link OutputJSON}.
    * 
    * @return {@link OutputJSON} representando o estado atual do simulador.
    */
@@ -134,31 +132,27 @@ public final class Main {
 
     // Adicionando todos registradores que possuem valor != 0
     LinkedHashMap<String, Integer> regsMap = new LinkedHashMap<>();
-    registers.entrySet().stream()
-        .sorted(Comparator.comparing(e -> {
-          String k = e.getKey();
-          if (k.equals("pc")) {
-            // Depois de todos registradores
-            return 900;
-          } else if (k.equals("hi")) {
-            // Depois de pc
-            return 901;
-          } else if (k.equals("lo")) {
-            // Depois de hi
-            return 902;
-          } else {
-            // De acordo com número do registrador
-            return Integer.parseInt(k.replace("$", ""));
-          }
-        }))
-        .filter(e -> e.getValue() != 0)
-        .forEachOrdered(e -> regsMap.put(e.getKey(), e.getValue()));
+    registers.entrySet().stream().sorted(Comparator.comparing(e -> {
+      String k = e.getKey();
+      if (k.equals("pc")) {
+        // Depois de todos registradores
+        return 900;
+      } else if (k.equals("hi")) {
+        // Depois de pc
+        return 901;
+      } else if (k.equals("lo")) {
+        // Depois de hi
+        return 902;
+      } else {
+        // De acordo com número do registrador
+        return Integer.parseInt(k.replace("$", ""));
+      }
+    })).filter(e -> e.getValue() != 0).forEachOrdered(e -> regsMap.put(e.getKey(), e.getValue()));
     outputJSON.registers = regsMap;
 
     // Adicionando todas células de memória que possuem valor != 0
     LinkedHashMap<String, Integer> memMap = new LinkedHashMap<>();
-    memory.entrySet().stream()
-        .sorted(Comparator.comparing(Entry::getKey))
+    memory.entrySet().stream().sorted(Comparator.comparing(Entry::getKey))
         .filter(e -> e.getValue() != 0)
         .forEachOrdered(e -> memMap.put(e.getKey().toString(), e.getValue()));
     outputJSON.memory = memMap;
