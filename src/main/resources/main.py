@@ -6,7 +6,7 @@ import dearpygui.dearpygui as dpg
 from dearpygui._dearpygui import mvDir_Right
 
 
-INPUT_PATH = 'input/gui/'
+INPUT_PATH = 'output/gui/'
 FONT_PATH = "src/main/resources/fonts/roboto-regular.ttf"
 
 INITIAL_JSON: typing.Dict = None
