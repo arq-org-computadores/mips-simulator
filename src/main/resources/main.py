@@ -81,6 +81,24 @@ def _update_regs():
         dpg.set_value(tag, value)
 
 
+def _update_memory():
+    global MEMORY
+
+    for mem in MEMORY:
+        value = mem.value
+
+        if value != 0:
+            address = mem.address
+            tag = f"mem-{address}"
+
+            if dpg.does_item_exist(tag):
+                dpg.set_value(tag, value)
+            else:
+                with dpg.table_row(parent="mem-table"):
+                    dpg.add_text(address)
+                    dpg.add_text(value, tag=tag)
+
+
 def _update_assembly():
     global INSTRUCTIONS
 
@@ -120,6 +138,7 @@ def move_next():
     _load_assembly()
 
     _update_regs()
+    _update_memory()
     _update_assembly()
 
 
@@ -218,7 +237,7 @@ if __name__ == '__main__':
             for mem in MEMORY:
                 with dpg.table_row():
                     dpg.add_text(mem.address)
-                    dpg.add_text(mem.value)
+                    dpg.add_text(mem.value, tag=f"mem-{mem.address}")
 
     with dpg.window(label="Principal",
                     width=580,
