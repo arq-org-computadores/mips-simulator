@@ -34,6 +34,7 @@ MEMORY: typing.List[MemoryLocation] = []
 
 TEXT_BEGIN = 4194304
 TEXT_END = 268435452
+HIGHLIGHT_PC: int = 0
 
 
 def _load_regs_mem():
@@ -101,6 +102,7 @@ def _update_memory():
 
 def _update_assembly():
     global INSTRUCTIONS
+    global HIGHLIGHT_PC
 
     for inst in INSTRUCTIONS:
         if inst.assembly_str != '':
@@ -108,8 +110,17 @@ def _update_assembly():
             value = inst.assembly_str
             dpg.set_value(tag, value)
 
+            if int(inst.address) == int(HIGHLIGHT_PC):
+                dpg.configure_item(tag, color=[50, 168, 82, 255])
+            else:
+                dpg.configure_item(tag, color=[255, 255, 255, 255])
+
 
 def load_data():
+    global HIGHLIGHT_PC
+    global LIST_INDEX
+    global JSON_LIST
+
     i = 0
     LIST_INDEX = 0
     path = os.path.join(INPUT_PATH, f'{i}.json')
@@ -122,11 +133,19 @@ def load_data():
         path = os.path.join(INPUT_PATH, f'{i}.json')
 
     _load_regs_mem()
+    HIGHLIGHT_PC = REGISTERS['pc']
 
 
 def move_next():
     global LIST_INDEX
     global JSON_LIST
+    global REGISTERS
+    global HIGHLIGHT_PC
+    global _load_regs_mem
+    global _load_assembly
+    global _update_regs
+    global _update_memory
+    global _update_assembly
 
     if LIST_INDEX + 1 >= len(JSON_LIST):
         sys.exit(0)
@@ -134,6 +153,7 @@ def move_next():
 
     LIST_INDEX += 1
 
+    HIGHLIGHT_PC = REGISTERS['pc']
     _load_regs_mem()
     _load_assembly()
 
