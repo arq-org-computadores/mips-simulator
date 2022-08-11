@@ -9,14 +9,14 @@ import dearpygui.dearpygui as dpg
 from dearpygui._dearpygui import mvDir_Right
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class Instruction:
     hex_str: str
     assembly_str: str
     address: int
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=False)
 class MemoryLocation:
     address: str
     value: int
@@ -56,7 +56,20 @@ def _load_regs_mem():
         REGISTERS[reg_i] = regs[reg_i]
 
 
+def _load_assembly():
+    hex_str = JSON_LIST[LIST_INDEX]["hex"]
+    assembly = JSON_LIST[LIST_INDEX]["text"]
+
+    for inst in INSTRUCTIONS:
+        if inst.hex_str == hex_str:
+            inst.assembly_str = str(assembly)
+            print(inst)
+            break
+
+
 def _update_regs():
+    global REGISTERS
+
     for i in range(32):
         id_ = f"${i}"
         tag = f"reg-{i}"
@@ -67,6 +80,16 @@ def _update_regs():
         tag = f"reg-{id_}"
         value = REGISTERS[id_] if id_ in REGISTERS else 0
         dpg.set_value(tag, value)
+
+
+def _update_assembly():
+    global INSTRUCTIONS
+
+    for inst in INSTRUCTIONS:
+        if inst.assembly_str != '':
+            tag = f"assembly-{inst.address}"
+            value = inst.assembly_str
+            dpg.set_value(tag, value)
 
 
 def load_data():
@@ -89,11 +112,16 @@ def move_next():
     global INSTRUCTIONS
 
     if LIST_INDEX > len(INSTRUCTIONS):
+        exit(0)
         return
 
     LIST_INDEX += 1
+
     _load_regs_mem()
+    _load_assembly()
+
     _update_regs()
+    _update_assembly()
 
 
 if __name__ == '__main__':
@@ -200,21 +228,23 @@ if __name__ == '__main__':
                     **default_window_configs):
         with dpg.table(tag="main-table",
                        header_row=True,
-                       resizable=True,
+                       resizable=False,
                        policy=dpg.mvTable_SizingStretchProp,
                        borders_outerH=True,
                        borders_innerV=True,
                        borders_innerH=True,
                        borders_outerV=True):
-            dpg.add_table_column(label="Endereço")
-            dpg.add_table_column(label="Linguagem de Máquina")
-            dpg.add_table_column(label="Assembly")
+            dpg.add_table_column(label="Endereço", width=120, width_fixed=True)
+            dpg.add_table_column(label="Linguagem de Máquina",
+                                 width=120, width_fixed=True)
+            dpg.add_table_column(label="Assembly", width=340)
 
             for inst in INSTRUCTIONS:
                 with dpg.table_row():
                     dpg.add_text(inst.address)
                     dpg.add_text(inst.hex_str)
-                    dpg.add_text(inst.assembly_str)
+                    dpg.add_text(inst.assembly_str,
+                                 tag=f"assembly-{inst.address}")
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
