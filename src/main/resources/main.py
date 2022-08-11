@@ -16,6 +16,18 @@ class Instruction:
     address: int
 
 
+@dataclass(frozen=True)
+class Register:
+    id: str
+    value: int
+
+
+@dataclass(frozen=True)
+class MemoryLocation:
+    address: str
+    value: int
+
+
 INPUT_PATH = 'output/gui/'
 FONT_PATH = "src/main/resources/fonts/roboto-regular.ttf"
 
@@ -23,6 +35,8 @@ JSON_LIST: typing.List[typing.Dict] = []
 LIST_INDEX = None
 
 INSTRUCTIONS: typing.List[Instruction] = []
+REGISTERS: typing.List[Register] = []
+MEMORY: typing.List[MemoryLocation] = []
 
 TEXT_BEGIN = 4194304
 TEXT_END = 268435452
@@ -30,6 +44,7 @@ TEXT_END = 268435452
 
 def load_data():
     i = 0
+    LIST_INDEX = -1
     path = os.path.join(INPUT_PATH, f'{i}.json')
 
     while os.path.exists(path):
@@ -48,6 +63,9 @@ def load_data():
             INSTRUCTIONS.append(Instruction(hex_str=hex_str,
                                             assembly_str="",
                                             address=addr))
+        else:
+            MEMORY.append(MemoryLocation(address=addr,
+                                         value=mem[addr]))
 
 
 def move_next():
@@ -138,6 +156,11 @@ if __name__ == '__main__':
                        borders_outerV=True):
             dpg.add_table_column(label="Endereço")
             dpg.add_table_column(label="Valor")
+
+            for mem in MEMORY:
+                with dpg.table_row():
+                    dpg.add_text(mem.address)
+                    dpg.add_text(mem.value)
 
     with dpg.window(label="Principal",
                     width=580,
