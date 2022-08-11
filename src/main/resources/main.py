@@ -1,24 +1,53 @@
 import os
 import json
 import typing
+import binascii
+
+from dataclasses import dataclass
 
 import dearpygui.dearpygui as dpg
 from dearpygui._dearpygui import mvDir_Right
 
 
+@dataclass(frozen=True)
+class Instruction:
+    hex_str: str
+    assembly_str: str
+    address: int
+
+
 INPUT_PATH = 'output/gui/'
 FONT_PATH = "src/main/resources/fonts/roboto-regular.ttf"
 
-INITIAL_JSON: typing.Dict = None
-JSON_LIST: typing.List[typing.Dict] = None
+JSON_LIST: typing.List[typing.Dict] = []
 LIST_INDEX = None
 
-INSTRUCTIONS_HEX: typing.List[typing.Dict] = None
+INSTRUCTIONS: typing.List[Instruction] = []
+
+TEXT_BEGIN = 4194304
+TEXT_END = 268435452
 
 
 def load_data():
-    with open(os.path.join(INPUT_PATH, '0.json')) as json_file:
-        INITIAL_JSON = json.load(json_file)
+    i = 0
+    path = os.path.join(INPUT_PATH, f'{i}.json')
+
+    while os.path.exists(path):
+        with open(path) as json_file:
+            JSON_LIST.insert(i, json.load(json_file))
+
+        i += 1
+        path = os.path.join(INPUT_PATH, f'{i}.json')
+
+    mem = JSON_LIST[0]['mem']
+    for addr in mem:
+        i_addr = int(addr)
+        if i_addr >= TEXT_BEGIN and i_addr <= TEXT_END:
+            hex_str = hex(int(mem[addr]) + 2**32)
+            hex_str = hex_str[0:2] + hex_str[3:]
+            INSTRUCTIONS.append(Instruction(hex_str=hex_str,
+                                            assembly_str="",
+                                            address=addr))
 
 
 def move_next():
@@ -126,6 +155,12 @@ if __name__ == '__main__':
             dpg.add_table_column(label="Endereço")
             dpg.add_table_column(label="Linguagem de Máquina")
             dpg.add_table_column(label="Assembly")
+
+            for inst in INSTRUCTIONS:
+                with dpg.table_row():
+                    dpg.add_text(inst.address)
+                    dpg.add_text(inst.hex_str)
+                    dpg.add_text(inst.assembly_str)
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
