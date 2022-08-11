@@ -13,7 +13,7 @@ from dearpygui._dearpygui import mvDir_Right
 class Instruction:
     hex_str: str
     assembly_str: str
-    address: int
+    address: str
 
 
 @dataclass(frozen=False)
@@ -34,10 +34,13 @@ MEMORY: typing.List[MemoryLocation] = []
 
 TEXT_BEGIN = 4194304
 TEXT_END = 268435452
-HIGHLIGHT_PC: int = 0
 
 
 def _load_regs_mem():
+    global JSON_LIST
+    global LIST_INDEX
+    global REGISTERS
+
     mem = JSON_LIST[LIST_INDEX]['mem']
     for addr in mem:
         i_addr = int(addr)
@@ -58,13 +61,16 @@ def _load_regs_mem():
 
 
 def _load_assembly():
-    hex_str = JSON_LIST[LIST_INDEX]["hex"]
-    assembly = JSON_LIST[LIST_INDEX]["text"]
+    global JSON_LIST
+    global LIST_INDEX
 
-    for inst in INSTRUCTIONS:
-        if inst.hex_str == hex_str:
-            inst.assembly_str = str(assembly)
-            break
+    if LIST_INDEX + 1 < len(JSON_LIST):
+        hex_str = JSON_LIST[LIST_INDEX + 1]["hex"]
+        assembly = JSON_LIST[LIST_INDEX + 1]["text"]
+
+        for inst in INSTRUCTIONS:
+            if inst.assembly_str == '' and inst.hex_str == hex_str:
+                inst.assembly_str = str(assembly)
 
 
 def _update_regs():
@@ -102,7 +108,8 @@ def _update_memory():
 
 def _update_assembly():
     global INSTRUCTIONS
-    global HIGHLIGHT_PC
+    global LIST_INDEX
+    global REGISTERS
 
     for inst in INSTRUCTIONS:
         if inst.assembly_str != '':
@@ -110,14 +117,13 @@ def _update_assembly():
             value = inst.assembly_str
             dpg.set_value(tag, value)
 
-            if int(inst.address) == int(HIGHLIGHT_PC):
+            if int(inst.address) == int(REGISTERS['pc']):
                 dpg.configure_item(tag, color=[50, 168, 82, 255])
             else:
                 dpg.configure_item(tag, color=[255, 255, 255, 255])
 
 
 def load_data():
-    global HIGHLIGHT_PC
     global LIST_INDEX
     global JSON_LIST
 
@@ -133,14 +139,13 @@ def load_data():
         path = os.path.join(INPUT_PATH, f'{i}.json')
 
     _load_regs_mem()
-    HIGHLIGHT_PC = REGISTERS['pc']
+    _load_assembly()
 
 
 def move_next():
     global LIST_INDEX
     global JSON_LIST
     global REGISTERS
-    global HIGHLIGHT_PC
     global _load_regs_mem
     global _load_assembly
     global _update_regs
@@ -153,7 +158,6 @@ def move_next():
 
     LIST_INDEX += 1
 
-    HIGHLIGHT_PC = REGISTERS['pc']
     _load_regs_mem()
     _load_assembly()
 
@@ -215,26 +219,13 @@ if __name__ == '__main__':
                 with dpg.table_row():
                     id_ = f"${i}"
                     dpg.add_text(id_)
-                    dpg.add_text(
-                        REGISTERS[id_] if id_ in REGISTERS else 0, tag=f"reg-{i}")
+                    dpg.add_text(0, tag=f"reg-{i}")
 
-            with dpg.table_row():
-                id_ = "pc"
-                dpg.add_text(id_)
-                dpg.add_text(
-                    REGISTERS[id_] if id_ in REGISTERS else 0, tag="reg-pc")
-
-            with dpg.table_row():
-                id_ = "hi"
-                dpg.add_text(id_)
-                dpg.add_text(
-                    REGISTERS[id_] if id_ in REGISTERS else 0, tag="reg-hi")
-
-            with dpg.table_row():
-                id_ = "lo"
-                dpg.add_text(id_)
-                dpg.add_text(
-                    REGISTERS[id_] if id_ in REGISTERS else 0, tag="reg-lo")
+            for id_ in ["pc", "hi", "lo"]:
+                tag = f"reg-{id_}"
+                with dpg.table_row():
+                    dpg.add_text(id_)
+                    dpg.add_text(0, tag=tag)
 
             dpg.bind_font(small_font)
 
@@ -253,11 +244,6 @@ if __name__ == '__main__':
                        borders_outerV=True):
             dpg.add_table_column(label="Endereço")
             dpg.add_table_column(label="Valor")
-
-            for mem in MEMORY:
-                with dpg.table_row():
-                    dpg.add_text(mem.address)
-                    dpg.add_text(mem.value, tag=f"mem-{mem.address}")
 
     with dpg.window(label="Principal",
                     width=580,
@@ -283,6 +269,11 @@ if __name__ == '__main__':
                     dpg.add_text(inst.hex_str)
                     dpg.add_text(inst.assembly_str,
                                  tag=f"assembly-{inst.address}")
+
+
+    _update_assembly()
+    _update_memory()
+    _update_regs()
 
     dpg.setup_dearpygui()
     dpg.show_viewport()
