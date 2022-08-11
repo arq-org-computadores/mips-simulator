@@ -1,8 +1,8 @@
-import os
-import json
-import typing
 import binascii
-
+import json
+import os
+import sys
+import typing
 from dataclasses import dataclass
 
 import dearpygui.dearpygui as dpg
@@ -41,8 +41,8 @@ def _load_regs_mem():
     for addr in mem:
         i_addr = int(addr)
         if i_addr >= TEXT_BEGIN and i_addr <= TEXT_END:
-            hex_str = hex(int(mem[addr]) + 2**32)
-            aux = hex_str[3:]
+            hex_str = hex(int(mem[addr]) & 0xffffffff)
+            aux = hex_str[2:]
             hex_str = hex_str[0:2] + ''.join(["0"] * (8 - len(aux))) + aux
             INSTRUCTIONS.append(Instruction(hex_str=hex_str,
                                             assembly_str="",
@@ -63,7 +63,6 @@ def _load_assembly():
     for inst in INSTRUCTIONS:
         if inst.hex_str == hex_str:
             inst.assembly_str = str(assembly)
-            print(inst)
             break
 
 
@@ -112,7 +111,7 @@ def move_next():
     global INSTRUCTIONS
 
     if LIST_INDEX > len(INSTRUCTIONS):
-        exit(0)
+        sys.exit(0)
         return
 
     LIST_INDEX += 1
