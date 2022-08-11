@@ -2,6 +2,8 @@
 
 MIPS32 é um conjunto de instruções 32 bits. Esse projeto permite executar diferentes instruções dessa arquitetura através de uma simulação de um microprocessador MIPS.
 
+![GUI do Simulador](docs/imgs/gui.png)
+
 ## Arquitetura do Sistema
 
 ```mermaid
@@ -12,7 +14,7 @@ flowchart TD
 
 O Simulador é organizado em 3 camadas distintas:
 
-- Camada de **Apresentação**, responsável pela exibição dos dados e comunicação com o usuário (leitura de entradas, produção de saídas, etc);
+- Camada de **Apresentação**, responsável pela exibição dos dados (CLI e GUI) e comunicação com o usuário (leitura de entradas, produção de saídas, etc);
 - Camada de **Simulação**, que implementa as funcionalidades de um processador MIPS32 (instruções, controle de memória, execução, etc);
 - Camada de **Dados**, implementa as estruturas de memórias utilizadas pelo processador (registradores, memória principal);
 
@@ -68,9 +70,9 @@ class IRegister {
 
 # Equipe
 
-- Lucas Henrique [![Github Badge](https://img.shields.io/badge/-hipera09-100000?style=flat-square&logo=Github&logoColor=white)](https://github.com/hipera09)
-- Moésio Filho [![Github Badge](https://img.shields.io/badge/-moesio--f-100000?style=flat-square&logo=Github&logoColor=white)](https://github.com/moesio-f)
-- Vitor Alencar [![Github Badge](https://img.shields.io/badge/-vitohrs-100000?style=flat-square&logo=Github&logoColor=white)](https://github.com/vitohrs)
+- **Lucas Henrique** [![Github Badge](https://img.shields.io/badge/-hipera09-100000?style=flat-square&logo=Github&logoColor=white)](https://github.com/hipera09)
+- **Moésio Filho** [![Github Badge](https://img.shields.io/badge/-moesio--f-100000?style=flat-square&logo=Github&logoColor=white)](https://github.com/moesio-f)
+- **Vitor Alencar** [![Github Badge](https://img.shields.io/badge/-vitohrs-100000?style=flat-square&logo=Github&logoColor=white)](https://github.com/vitohrs)
 
 ---
 *Os requisitos do projeto podem ser encontrados em [Projeto Simulador MIPS](https://view.genial.ly/62cf619eccc76b0014a9441f/interactive-content-aoc20212projeto-mips) e [Arquivos Auxiliares - MIPS](https://drive.google.com/drive/folders/1bzvUjVc2xfN5_mko3-XLL95YCfXPL97L).*
