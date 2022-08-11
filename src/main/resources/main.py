@@ -59,7 +59,8 @@ def load_data():
         i_addr = int(addr)
         if i_addr >= TEXT_BEGIN and i_addr <= TEXT_END:
             hex_str = hex(int(mem[addr]) + 2**32)
-            hex_str = hex_str[0:2] + hex_str[3:]
+            aux = hex_str[3:]
+            hex_str = hex_str[0:2] + ''.join(["0"] * (8 - len(aux))) + aux
             INSTRUCTIONS.append(Instruction(hex_str=hex_str,
                                             assembly_str="",
                                             address=addr))
