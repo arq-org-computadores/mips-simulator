@@ -26,7 +26,7 @@ INPUT_PATH = 'output/gui/'
 FONT_PATH = "src/main/resources/fonts/roboto-regular.ttf"
 
 JSON_LIST: typing.List[typing.Dict] = []
-LIST_INDEX = None
+LIST_INDEX: int = 0
 
 INSTRUCTIONS: typing.List[Instruction] = []
 REGISTERS: typing.Dict[str, int] = {}
@@ -34,6 +34,39 @@ MEMORY: typing.List[MemoryLocation] = []
 
 TEXT_BEGIN = 4194304
 TEXT_END = 268435452
+
+
+def _load_regs_mem():
+    mem = JSON_LIST[LIST_INDEX]['mem']
+    for addr in mem:
+        i_addr = int(addr)
+        if i_addr >= TEXT_BEGIN and i_addr <= TEXT_END:
+            hex_str = hex(int(mem[addr]) + 2**32)
+            aux = hex_str[3:]
+            hex_str = hex_str[0:2] + ''.join(["0"] * (8 - len(aux))) + aux
+            INSTRUCTIONS.append(Instruction(hex_str=hex_str,
+                                            assembly_str="",
+                                            address=addr))
+        else:
+            MEMORY.append(MemoryLocation(address=addr,
+                                         value=mem[addr]))
+
+    regs = JSON_LIST[LIST_INDEX]['regs']
+    for reg_i in regs:
+        REGISTERS[reg_i] = regs[reg_i]
+
+
+def _update_regs():
+    for i in range(32):
+        id_ = f"${i}"
+        tag = f"reg-{i}"
+        value = REGISTERS[id_] if id_ in REGISTERS else 0
+        dpg.set_value(tag, value)
+
+    for id_ in ["pc", "hi", "lo"]:
+        tag = f"reg-{id_}"
+        value = REGISTERS[id_] if id_ in REGISTERS else 0
+        dpg.set_value(tag, value)
 
 
 def load_data():
@@ -48,28 +81,19 @@ def load_data():
         i += 1
         path = os.path.join(INPUT_PATH, f'{i}.json')
 
-    mem = JSON_LIST[0]['mem']
-    for addr in mem:
-        i_addr = int(addr)
-        if i_addr >= TEXT_BEGIN and i_addr <= TEXT_END:
-            hex_str = hex(int(mem[addr]) + 2**32)
-            aux = hex_str[3:]
-            hex_str = hex_str[0:2] + ''.join(["0"] * (8 - len(aux))) + aux
-            INSTRUCTIONS.append(Instruction(hex_str=hex_str,
-                                            assembly_str="",
-                                            address=addr))
-        else:
-            MEMORY.append(MemoryLocation(address=addr,
-                                         value=mem[addr]))
-
-    regs = JSON_LIST[0]['regs']
-    for reg_i in regs:
-        REGISTERS[reg_i] = regs[reg_i]
+    _load_regs_mem()
 
 
 def move_next():
-    print('Próxima instrução')
-    pass
+    global LIST_INDEX
+    global INSTRUCTIONS
+
+    if LIST_INDEX > len(INSTRUCTIONS):
+        return
+
+    LIST_INDEX += 1
+    _load_regs_mem()
+    _update_regs()
 
 
 if __name__ == '__main__':
@@ -110,7 +134,7 @@ if __name__ == '__main__':
                     height=630,
                     pos=[580, 0],
                     **default_window_configs):
-        with dpg.table(label="reg-table",
+        with dpg.table(tag="reg-table",
                        header_row=False,
                        resizable=True,
                        policy=dpg.mvTable_SizingStretchProp,
@@ -125,22 +149,26 @@ if __name__ == '__main__':
                 with dpg.table_row():
                     id_ = f"${i}"
                     dpg.add_text(id_)
-                    dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
+                    dpg.add_text(
+                        REGISTERS[id_] if id_ in REGISTERS else 0, tag=f"reg-{i}")
 
             with dpg.table_row():
                 id_ = "pc"
                 dpg.add_text(id_)
-                dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
+                dpg.add_text(
+                    REGISTERS[id_] if id_ in REGISTERS else 0, tag="reg-pc")
 
             with dpg.table_row():
                 id_ = "hi"
                 dpg.add_text(id_)
-                dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
+                dpg.add_text(
+                    REGISTERS[id_] if id_ in REGISTERS else 0, tag="reg-hi")
 
             with dpg.table_row():
                 id_ = "lo"
                 dpg.add_text(id_)
-                dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
+                dpg.add_text(
+                    REGISTERS[id_] if id_ in REGISTERS else 0, tag="reg-lo")
 
             dpg.bind_font(small_font)
 
@@ -149,7 +177,7 @@ if __name__ == '__main__':
                     height=300,
                     pos=[0, 420],
                     **default_window_configs):
-        with dpg.table(label="mem-table",
+        with dpg.table(tag="mem-table",
                        header_row=True,
                        resizable=True,
                        policy=dpg.mvTable_SizingStretchProp,
@@ -170,7 +198,7 @@ if __name__ == '__main__':
                     height=420,
                     pos=[0, 0],
                     **default_window_configs):
-        with dpg.table(label="main-table",
+        with dpg.table(tag="main-table",
                        header_row=True,
                        resizable=True,
                        policy=dpg.mvTable_SizingStretchProp,
