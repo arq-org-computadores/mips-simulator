@@ -108,9 +108,9 @@ def load_data():
 
 def move_next():
     global LIST_INDEX
-    global INSTRUCTIONS
+    global JSON_LIST
 
-    if LIST_INDEX > len(INSTRUCTIONS):
+    if LIST_INDEX + 1 >= len(JSON_LIST):
         sys.exit(0)
         return
 
