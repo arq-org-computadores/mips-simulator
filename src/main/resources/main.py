@@ -17,12 +17,6 @@ class Instruction:
 
 
 @dataclass(frozen=True)
-class Register:
-    id: str
-    value: int
-
-
-@dataclass(frozen=True)
 class MemoryLocation:
     address: str
     value: int
@@ -35,7 +29,7 @@ JSON_LIST: typing.List[typing.Dict] = []
 LIST_INDEX = None
 
 INSTRUCTIONS: typing.List[Instruction] = []
-REGISTERS: typing.List[Register] = []
+REGISTERS: typing.Dict[str, int] = {}
 MEMORY: typing.List[MemoryLocation] = []
 
 TEXT_BEGIN = 4194304
@@ -44,7 +38,7 @@ TEXT_END = 268435452
 
 def load_data():
     i = 0
-    LIST_INDEX = -1
+    LIST_INDEX = 0
     path = os.path.join(INPUT_PATH, f'{i}.json')
 
     while os.path.exists(path):
@@ -67,6 +61,10 @@ def load_data():
         else:
             MEMORY.append(MemoryLocation(address=addr,
                                          value=mem[addr]))
+
+    regs = JSON_LIST[0]['regs']
+    for reg_i in regs:
+        REGISTERS[reg_i] = regs[reg_i]
 
 
 def move_next():
@@ -125,20 +123,24 @@ if __name__ == '__main__':
 
             for i in range(32):
                 with dpg.table_row():
-                    dpg.add_text(f"${i}")
-                    dpg.add_text("0")
+                    id_ = f"${i}"
+                    dpg.add_text(id_)
+                    dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
 
             with dpg.table_row():
-                dpg.add_text("pc")
-                dpg.add_text("0")
+                id_ = "pc"
+                dpg.add_text(id_)
+                dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
 
             with dpg.table_row():
-                dpg.add_text("hi")
-                dpg.add_text("0")
+                id_ = "hi"
+                dpg.add_text(id_)
+                dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
 
             with dpg.table_row():
-                dpg.add_text("lo")
-                dpg.add_text("0")
+                id_ = "lo"
+                dpg.add_text(id_)
+                dpg.add_text(REGISTERS[id_] if id_ in REGISTERS else "0")
 
             dpg.bind_font(small_font)
 
