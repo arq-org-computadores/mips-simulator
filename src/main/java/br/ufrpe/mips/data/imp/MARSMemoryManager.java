@@ -13,8 +13,7 @@ import br.ufrpe.mips.data.utils.RegisterType;
 /**
  * Classe que representa o gerenciador de memória do simulador MARS MIPS.
  * 
- * A memória é divida em diferentes segmentos que possuem endereçamento base e
- * limite.
+ * A memória é divida em diferentes segmentos que possuem endereçamento base e limite.
  * 
  * Cada célula de memória armazena 1 byte.
  * 
@@ -117,10 +116,30 @@ public final class MARSMemoryManager implements IMemoryManager {
 
   @Override
   public List<IMemoryLocation<Integer>> wordMemoryLocations() {
-    return this.byteMemoryLocations().stream().filter(l -> l.address() % 4 == 0)
-        .map(l -> new WordMemoryLocation((ByteMemoryLocation) l, this.memory.get(l.address() + 1),
-            this.memory.get(l.address() + 2), this.memory.get(l.address() + 3)))
-        .collect(Collectors.toList());
+    return this.byteMemoryLocations().stream().filter(l -> l.address() % 4 == 0).map(l -> {
+      ByteMemoryLocation b = (ByteMemoryLocation) l;
+      ByteMemoryLocation b1 = this.memory.get(l.address() + 1);
+      ByteMemoryLocation b2 = this.memory.get(l.address() + 2);
+      ByteMemoryLocation b3 = this.memory.get(l.address() + 3);
+
+      if (b == null) {
+        b = new ByteMemoryLocation(l.address(), MemoryLocationType.STATIC_DATA);
+      }
+
+      if (b1 == null) {
+        b1 = new ByteMemoryLocation(l.address() + 1, MemoryLocationType.STATIC_DATA);
+      }
+
+      if (b2 == null) {
+        b2 = new ByteMemoryLocation(l.address() + 2, MemoryLocationType.STATIC_DATA);
+      }
+
+      if (b3 == null) {
+        b3 = new ByteMemoryLocation(l.address() + 3, MemoryLocationType.STATIC_DATA);
+      }
+
+      return new WordMemoryLocation(b, b1, b2, b3);
+    }).collect(Collectors.toList());
   }
 
   @Override
