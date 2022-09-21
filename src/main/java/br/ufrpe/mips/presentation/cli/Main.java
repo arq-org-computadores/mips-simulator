@@ -3,6 +3,7 @@ package br.ufrpe.mips.presentation.cli;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -58,6 +59,7 @@ public final class Main {
     }
 
     InputJSON input = null;
+    ArrayList<OutputJSON> output = new ArrayList<>();
 
     try {
       input = Main.mapper.readValue(p.toFile(), InputJSON.class);
@@ -75,12 +77,12 @@ public final class Main {
     // --- EXECUÇÃO DO PROGRAMA ---
     while (Main.simulator.hasNextInstruction()) {
       Main.simulator.runNexInstruction();
-      // Possivelmente adicionar um log aqui
+      output.add(Main.getCurrentResults());
     }
 
     // --- FINALIZAÇÃO E ESCRITA DOS RESULTADOS ---
     try {
-      String result = Main.mapper.writer(Main.printer).writeValueAsString(Main.getCurrentResults());
+      String result = Main.mapper.writer(Main.printer).writeValueAsString(output);
 
       String fname = Main.outputFileName(p.getFileName().toString());
       Path out = Path.of(Main.outputPath.toString(), fname);
